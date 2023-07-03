@@ -4,10 +4,13 @@
  
  dotenv.config();
 
- var password = '45W4xcY9*?fZZr2';
- 
+
  const pool = new Pool({
-   connectionString: 'postgresql://sfm-mobile-user:45W4xcY9*%3FfZZr2@10.10.24.14:5432/test-fo-db',
+     host: process.env.DB_HOST,
+     port: process.env.DB_PORT,
+     user: process.env.DB_USER,
+     password: process.env.DB_PASSWORD,
+     database: process.env.DB_DATABASE
  });
  
  pool.on('connect', () => {
