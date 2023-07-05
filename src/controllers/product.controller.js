@@ -19,7 +19,7 @@
  
  exports.listAllFiles = async (req, res) => {
    const response = await db.query(
-     'SELECT * FROM news_news',
+     'SELECT * FROM files',
    );
    res.status(200).send(response.rows);
  };
