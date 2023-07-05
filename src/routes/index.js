@@ -20,7 +20,7 @@ router.post('/login', (req, res) => {
     console.log(req.body)
     // Query the database to validate the user's credentials and fetch additional data
     db.task(async t => {
-        const user = await t.oneOrNone('SELECT * FROM re_users WHERE "iin" = $1', [iin]);
+        const user = await t.oneOrNone('SELECT * FROM users WHERE "iin" = $1', [iin]);
         console.log(user)
 
         if (user && user.user_password === password) {
