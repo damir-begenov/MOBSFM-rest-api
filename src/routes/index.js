@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
 const pgp = require('pg-promise')();
 require('dotenv').config();
 
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const db = pgp(connectionString);
+
+const sns = new SNSClient({ region: 'us-west-2' });
 
 router.use(express.json());
 
@@ -54,5 +57,34 @@ router.post('/login', (req, res) => {
             res.status(500).json({ success: false, message: 'Internal server error' });
         });
 });
+
+router.post('/verify-sms', async (req, res) => {
+    const { phoneNumber } = req.body;
+
+    try {
+        // Generate a random verification code
+        const verificationCode = generateVerificationCode();
+
+        // Publish SMS message to SNS topic
+        const command = new PublishCommand({
+            Message: `Your verification code: ${verificationCode}`,
+            PhoneNumber: phoneNumber
+        });
+
+        await sns.send(command);
+
+        // Return success response
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error sending SMS:', error);
+        res.status(500).json({ error: 'Failed to send SMS' });
+    }
+});
+
+// Helper function to generate a random verification code
+function generateVerificationCode() {
+    // Implement your code generation logic here
+    return Math.floor(1000 + Math.random() * 9000);
+}
 
 module.exports = router;
