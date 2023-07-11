@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
 const pgp = require('pg-promise')();
+const xml2js = require('xml2js');
+const Organization = require('../classes/organization.js');
 require('dotenv').config();
 
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
-const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+const connectionString = `postgres://${DB_USERNAME}:${encodeURIComponent(DB_PASSWORD)}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const db = pgp(connectionString);
 
-const sns = new SNSClient({ region: 'us-west-2' });
 
 router.use(express.json());
 
@@ -23,23 +23,29 @@ router.post('/login', (req, res) => {
     console.log(req.body)
     // Query the database to validate the user's credentials and fetch additional data
     db.task(async t => {
-        const user = await t.oneOrNone('SELECT * FROM users WHERE "iin" = $1', [iin]);
-        console.log(user)
+        const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
 
-        if (user && user.user_password === password) {
-            console.log(user.org_id)
-            const organization = await t.oneOrNone('SELECT * FROM organization WHERE id = $1', [user.org_id]);
+        console.log(user)
+        if (user && user.id === password) {
+            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
             console.log(organization)
             if (organization) {
-                const subjectCode = await t.oneOrNone('SELECT * FROM subject_codes WHERE id = $1', [organization.code_id]);
-                const orgType = await t.oneOrNone('SELECT * FROM org_types WHERE id = $1', [organization.org_type_id]);
+                const xmlData = organization.xml_to_sign;
+                const organization_instance = new Organization(xmlData);
+                await organization_instance.parseXml();
 
+                const parser = new xml2js.Parser();
+                const parsedData = await parser.parseStringPromise(xmlData);
+                const organisationData = parsedData.Data.Root[0].OrganisationData[0];
+                const cfmCode = organisationData.CfmCode[0];
+                const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
+                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
                 // Authentication successful
                 res.json({
                     success: true,
                     message: 'Login successful',
                     user: user,
-                    organization: organization,
+                    organization: organization_instance,
                     subjectCode: subjectCode,
                     orgType: orgType
                 });
@@ -57,34 +63,5 @@ router.post('/login', (req, res) => {
             res.status(500).json({ success: false, message: 'Internal server error' });
         });
 });
-
-router.post('/verify-sms', async (req, res) => {
-    const { phoneNumber } = req.body;
-
-    try {
-        // Generate a random verification code
-        const verificationCode = generateVerificationCode();
-
-        // Publish SMS message to SNS topic
-        const command = new PublishCommand({
-            Message: `Your verification code: ${verificationCode}`,
-            PhoneNumber: phoneNumber
-        });
-
-        await sns.send(command);
-
-        // Return success response
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error sending SMS:', error);
-        res.status(500).json({ error: 'Failed to send SMS' });
-    }
-});
-
-// Helper function to generate a random verification code
-function generateVerificationCode() {
-    // Implement your code generation logic here
-    return Math.floor(1000 + Math.random() * 9000);
-}
 
 module.exports = router;
