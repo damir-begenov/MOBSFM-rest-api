@@ -81,10 +81,6 @@ router.post('/checkSession', (req, res) => {
                 const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]) || null;
                 const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
 
-                date_issue = user_document['date_issue'].toString();
-                console.log(date_issue);
-
-
                 organization_instance.subjectCode = subjectCode['name'];
                 organization_instance.orgType = orgType['type'];
                 user.docType = docType['name'];
@@ -153,7 +149,6 @@ router.post('/login', (req, res) => {
                 const parser = new xml2js.Parser();
                 const parsedData = await parser.parseStringPromise(xmlData);
                 const organisationData = parsedData.Data.Root[0].OrganisationData[0];
-                const additionalAcData = organisationData.AdditionalAcData[0];
 
                 const cfmCode = organisationData.CfmCode[0]['_'];
 
@@ -162,19 +157,20 @@ router.post('/login', (req, res) => {
                 const userId = user.user_id;
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
-                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [accounts_document_id['document_id']]) || null;
+                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]) || null;
                 const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
 
                 organization_instance.subjectCode = subjectCode['name'];
                 organization_instance.orgType = orgType['type'];
-
-                user.docType = docType && docType.name ? docType.name : null;
+                user.docType = docType['name'];
                 user.docNumber = user_document['number'];
                 user.docDateIssued = user_document['date_issue'];
                 user.docIssuedBy = user_document['issued_by'];
                 user.docSeries = user_document['series']
                 user.userRole = userRole['role'];
 
+                console.log(user);
+                console.log(organization);
                 // Authentication successful
                 res.json({
                     success: true,
