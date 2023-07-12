@@ -29,7 +29,8 @@ router.post('/checkSession', (req, res) => {
         console.log(user)
         if (user) {
             const token = jwt.sign(
-                { user_id: user._id, email },
+                { user_id: user._id, iin },
+    
                 'chelovekpauk',
                 {
                   expiresIn: "2h",
