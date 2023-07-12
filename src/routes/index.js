@@ -43,20 +43,32 @@ router.get('/news', (req, res) => {
                 const xmlData = organization.xml_to_sign;
                 const organization_instance = new Organization(xmlData);
                 await organization_instance.parseXml();
+
                 const parser = new xml2js.Parser();
                 const parsedData = await parser.parseStringPromise(xmlData);
                 const organisationData = parsedData.Data.Root[0].OrganisationData[0];
-                const cfmCode = organisationData.CfmCode[0];
+                const additionalAcData = organisationData.AdditionalAcData[0];
+
+                const cfmCode = organisationData.CfmCode[0]['_'];
+                const docId = additionalAcData.DocumentIdentity[0]['_'];
+                const userId = user.user_id;
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
+                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [docId]);
+                const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
+
+                organization_instance.subjectCode = subjectCode['name'];
+                organization_instance.orgType = orgType['type'];
+                organization_instance.org_docType = docType['name'];
+                user.userRole = userRole['role'];
+
                 // Authentication successful
                 res.json({
                     success: true,
                     message: 'Login successful',
                     user: user,
-                    organization: organization_instance,
-                    subjectCode: subjectCode,
-                    orgType: orgType
+                    organization_xml: organization_instance,
+                    organization: organization,
                 });
             } else {
                 // Organization not found
@@ -105,7 +117,6 @@ router.post('/login', (req, res) => {
                 const organisationData = parsedData.Data.Root[0].OrganisationData[0];
                 const additionalAcData = organisationData.AdditionalAcData[0];
 
-
                 const cfmCode = organisationData.CfmCode[0]['_'];
                 const docId = additionalAcData.DocumentIdentity[0]['_'];
                 const userId = user.user_id;
@@ -113,6 +124,12 @@ router.post('/login', (req, res) => {
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
                 const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [docId]);
                 const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
+
+                organization_instance.subjectCode = subjectCode['name'];
+                organization_instance.orgType = orgType['type'];
+                organization_instance.org_docType = docType['name'];
+                user.userRole = userRole['role'];
+
                 // Authentication successful
                 res.json({
                     success: true,
@@ -120,10 +137,6 @@ router.post('/login', (req, res) => {
                     user: user,
                     organization_xml: organization_instance,
                     organization: organization,
-                    subjectCode: subjectCode,
-                    orgType: orgType,
-                    docType: docType,
-                    userRole: userRole
                 });
             } else {
                 // Organization not found
