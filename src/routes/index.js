@@ -38,7 +38,6 @@ router.post('/checkSession', (req, res) => {
               );
               // save user token
               user.token = token;
-              print('fe');
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
             console.log(organization)
             if (organization) {
@@ -63,7 +62,6 @@ router.post('/checkSession', (req, res) => {
                 organization_instance.orgType = orgType['type'];
                 organization_instance.org_docType = docType['name'];
                 user.userRole = userRole['role'];
-                print('felll');
 
                 // Authentication successful
                 res.json({
