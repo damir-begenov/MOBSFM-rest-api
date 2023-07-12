@@ -6,6 +6,7 @@ const Organization = require('../classes/organization.js');
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const {auth} = require("firebase-admin");
+var randtoken = require('rand-token') 
 
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
@@ -20,7 +21,7 @@ router.get('/api', (req, res) => {
     });
 });
 
-router.get('/news', (req, res) => {
+router.get('/checkSession', (req, res) => {
     const {iin} = req.body;
 
     db.task(async t => {
@@ -34,7 +35,6 @@ router.get('/news', (req, res) => {
                   expiresIn: "2h",
                 }
               );
-        
               // save user token
               user.token = token;
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
@@ -86,6 +86,7 @@ router.get('/news', (req, res) => {
 });
 
 
+var refreshTokens = {} 
 
 router.post('/login', (req, res) => {
     const { iin, password } = req.body;
@@ -103,6 +104,9 @@ router.post('/login', (req, res) => {
 
         // save user token
         user.token = token;
+        var refreshToken = randtoken.uid(256) 
+        refreshTokens[refreshToken] = iin;
+        user.refreshToken = refreshToken;
         console.log(user)
         if (user && user.id === password) {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
@@ -131,7 +135,7 @@ router.post('/login', (req, res) => {
                 user.userRole = userRole['role'];
 
                 // Authentication successful
-                res.json({
+                 res.json({
                     success: true,
                     message: 'Login successful',
                     user: user,
@@ -152,5 +156,20 @@ router.post('/login', (req, res) => {
             res.status(500).json({ success: false, message: 'Internal server error' });
         });
 });
+
+app.post('/token', function (req, res, next) {
+    var iin = req.body.iin
+    var refreshToken = req.body.refreshToken
+    if((refreshToken in refreshTokens) && (refreshTokens[refreshToken] == username)) {
+      var user = {
+        'iin': iin,
+      }
+      var token = jwt.sign(user, 'chelovekpauk', { expiresIn: 300 })
+      res.json({token: 'JWT ' + token})
+    }
+    else {
+      res.send(401)
+    }
+  })
 
 module.exports = router;
