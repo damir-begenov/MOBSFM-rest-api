@@ -27,7 +27,7 @@ router.post('/checkSession', (req, res) => {
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         console.log(user)
-        if (user && user.id === password) {
+        if (user) {
             const token = jwt.sign(
                 { user_id: user._id, email },
                 'chelovekpauk',
