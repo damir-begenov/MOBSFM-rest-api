@@ -4,6 +4,7 @@ const pgp = require('pg-promise')();
 const xml2js = require('xml2js');
 const Organization = require('../classes/organization.js');
 require('dotenv').config();
+const jwt = require("jsonwebtoken");
 
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
@@ -16,6 +17,59 @@ router.get('/api', (req, res) => {
     res.status(200).send({
         success: true,
     });
+});
+
+router.get('/news', (req, res) => {
+    const {iin} = req.body;
+
+    db.task(async t => {
+        const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
+        console.log(user)
+        if (user && user.id === password) {
+            const token = jwt.sign(
+                { user_id: user._id, email },
+                process.env.TOKEN_KEY,
+                {
+                  expiresIn: "2h",
+                }
+              );
+        
+              // save user token
+              user.token = token;
+            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
+            console.log(organization)
+            if (organization) {
+                const xmlData = organization.xml_to_sign;
+                const organization_instance = new Organization(xmlData);
+                await organization_instance.parseXml();
+                const parser = new xml2js.Parser();
+                const parsedData = await parser.parseStringPromise(xmlData);
+                const organisationData = parsedData.Data.Root[0].OrganisationData[0];
+                const cfmCode = organisationData.CfmCode[0];
+                const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
+                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
+                // Authentication successful
+                res.json({
+                    success: true,
+                    message: 'Login successful',
+                    user: user,
+                    organization: organization_instance,
+                    subjectCode: subjectCode,
+                    orgType: orgType
+                });
+            } else {
+                // Organization not found
+                res.status(404).json({ success: false, message: 'Organization not found' });
+            }
+        } else {
+            // Invalid credentials
+            res.status(401).json({ success: false, message: 'Invalid iin or password' });
+        }
+    })
+        .catch(error => {
+            console.error('Error occurred while logging in:', error);
+            res.status(500).json({ success: false, message: 'Internal server error' });
+        });
 });
 
 router.post('/login', (req, res) => {

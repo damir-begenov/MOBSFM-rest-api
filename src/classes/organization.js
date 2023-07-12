@@ -29,14 +29,14 @@ class Organization {
         this.house = null;
         this.office = null;
         this.persons = null;
-    }
+   }
 
     async parseXml() {
         try {
             const parser = new xml2js.Parser();
             const parsedData = await parser.parseStringPromise(this.xmlData);
             const organisationData = parsedData.Data.Root[0].OrganisationData[0];
-
+            
             this.cfmCode = organisationData.CfmCode[0];
             this.opfCode = organisationData.OpfCode[0] || null;
             this.orgName = organisationData.OrgName[0] || null;
