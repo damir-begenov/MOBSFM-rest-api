@@ -53,11 +53,6 @@ class Organization {
             this.org_firstName = additionalAcData.FirstName[0] || null;
             this.org_secondName = additionalAcData.SecondName[0] || null;
             this.org_middleName = additionalAcData.MiddleName[0] || null;
-            this.org_documentIdentity = additionalAcData.DocumentIdentity[0] || null;
-            this.org_seriesDocIdentity = additionalAcData.SeriesDocIdentity[0] || null;
-            this.org_numberDocIdentity = additionalAcData.NumberDocIdentity[0] || null;
-            this.org_documentIssued = additionalAcData.DocumentIssued[0] || null;
-            this.org_dateIssuance = additionalAcData.DateIssuance[0] || null;
 
             this.postalIndex = organisationData.PostalIndex[0] || null;
             this.areaCode = organisationData.Area[0]['$'].Code || null;

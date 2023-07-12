@@ -63,19 +63,22 @@ router.post('/checkSession', (req, res) => {
                 const additionalAcData = organisationData.AdditionalAcData[0];
 
                 const cfmCode = organisationData.CfmCode[0]['_'];
-                const docId = additionalAcData.DocumentIdentity[0]['_'] || null;
+
+                const accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]);
+                const user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id]);
                 const userId = user.user_id;
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
-                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [docId]) || null;
+                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [accounts_document_id]) || null;
                 const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
 
                 organization_instance.subjectCode = subjectCode['name'];
                 organization_instance.orgType = orgType['type'];
-                organization_instance.org_docType = docType && docType.name ? docType.name : null;
 
-
-
+                user.docType = docType && docType.name ? docType.name : null;
+                user.docNumber = user_document['number'];
+                user.docDateIssued = user_document['date_issue'];
+                user.docIssuedBy = user_document['issued_by'];
                 user.userRole = userRole['role'];
 
                 // Authentication successful
