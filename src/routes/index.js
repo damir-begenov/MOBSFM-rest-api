@@ -79,6 +79,7 @@ router.post('/checkSession', (req, res) => {
                 user.docNumber = user_document['number'];
                 user.docDateIssued = user_document['date_issue'];
                 user.docIssuedBy = user_document['issued_by'];
+                user.docSeries = user_document['series'];
                 user.userRole = userRole['role'];
 
                 // Authentication successful
