@@ -12,12 +12,22 @@ const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const db = pgp(connectionString);
 
-
 router.use(express.json());
 
 router.get('/api', (req, res) => {
     res.status(200).send({
         success: true,
+    });
+});
+
+router.get('/education', (req, res) => {
+    db.task(async t => {
+        const education_category = t.oneOrNone('SELECT * FROM education_educationmaterial INNER JOIN education_educationfile ON education_educationmaterial.id = education_educationfile.category_id')
+        res.json({
+            education: education_category
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
     });
 });
 
