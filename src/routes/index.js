@@ -78,7 +78,7 @@ router.post('/checkSession', (req, res) => {
                 const userId = user.user_id;
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
-                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document[type_document_id]]) || null;
+                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]) || null;
                 const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
                 console.log(user_document);
                 organization_instance.subjectCode = subjectCode['name'];
