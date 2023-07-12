@@ -5,6 +5,7 @@ const xml2js = require('xml2js');
 const Organization = require('../classes/organization.js');
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
+const {auth} = require("firebase-admin");
 
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
@@ -72,13 +73,24 @@ router.get('/news', (req, res) => {
         });
 });
 
+
+
 router.post('/login', (req, res) => {
     const { iin, password } = req.body;
     console.log(req.body)
     // Query the database to validate the user's credentials and fetch additional data
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
+        const token = jwt.sign(
+            { user_id: user.iin, iin },
+            'chelovekpauk',
+            {
+                expiresIn: "2h",
+            }
+        );
 
+        // save user token
+        user.token = token;
         console.log(user)
         if (user && user.id === password) {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
