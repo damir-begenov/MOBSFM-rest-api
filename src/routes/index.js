@@ -63,11 +63,11 @@ router.post('/checkSession', (req, res) => {
                 const additionalAcData = organisationData.AdditionalAcData[0];
 
                 const cfmCode = organisationData.CfmCode[0]['_'];
-                const docId = additionalAcData.DocumentIdentity[0]['_'];
+                const docId = additionalAcData.DocumentIdentity[0]['_'] || null;
                 const userId = user.user_id;
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
-                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [docId]);
+                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [docId]) || null;
                 const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
 
                 organization_instance.subjectCode = subjectCode['name'];
