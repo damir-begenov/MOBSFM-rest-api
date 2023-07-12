@@ -157,19 +157,27 @@ router.post('/login', (req, res) => {
         });
 });
 
-app.post('/token', function (req, res, next) {
-    var iin = req.body.iin
-    var refreshToken = req.body.refreshToken
-    if((refreshToken in refreshTokens) && (refreshTokens[refreshToken] == username)) {
-      var user = {
-        'iin': iin,
-      }
-      var token = jwt.sign(user, 'chelovekpauk', { expiresIn: 300 })
-      res.json({token: 'JWT ' + token})
-    }
-    else {
-      res.send(401)
-    }
-  })
+// app.post('/token', function (req, res, next) {
+//     var iin = req.body.iin
+//     var refreshToken = req.body.refreshToken
+//     if((refreshToken in refreshTokens) && (refreshTokens[refreshToken] == username)) {
+//       var user = {
+//         'iin': iin,
+//       }
+//       var token = jwt.sign(user, 'chelovekpauk', { expiresIn: 300 })
+//       res.json({token: 'JWT ' + token})
+//     }
+//     else {
+//       res.send(401)
+//     }
+//   })
+
+//   app.post('/token/reject', function (req, res, next) { 
+//     var refreshToken = req.body.refreshToken 
+//     if(refreshToken in refreshTokens) { 
+//       delete refreshTokens[refreshToken]
+//     } 
+//     res.send(204) 
+//   })
 
 module.exports = router;
