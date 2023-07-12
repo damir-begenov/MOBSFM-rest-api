@@ -37,6 +37,7 @@ router.get('/checkSession', (req, res) => {
               );
               // save user token
               user.token = token;
+              print('fe');
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
             console.log(organization)
             if (organization) {
@@ -61,6 +62,7 @@ router.get('/checkSession', (req, res) => {
                 organization_instance.orgType = orgType['type'];
                 organization_instance.org_docType = docType['name'];
                 user.userRole = userRole['role'];
+                print('felll');
 
                 // Authentication successful
                 res.json({
@@ -157,27 +159,27 @@ router.post('/login', (req, res) => {
         });
 });
 
-// app.post('/token', function (req, res, next) {
-//     var iin = req.body.iin
-//     var refreshToken = req.body.refreshToken
-//     if((refreshToken in refreshTokens) && (refreshTokens[refreshToken] == username)) {
-//       var user = {
-//         'iin': iin,
-//       }
-//       var token = jwt.sign(user, 'chelovekpauk', { expiresIn: 300 })
-//       res.json({token: 'JWT ' + token})
-//     }
-//     else {
-//       res.send(401)
-//     }
-//   })
+router.post('/token', function (req, res, next) {
+    var iin = req.body.iin
+    var refreshToken = req.body.refreshToken
+    if((refreshToken in refreshTokens) && (refreshTokens[refreshToken] == username)) {
+      var user = {
+        'iin': iin,
+      }
+      var token = jwt.sign(user, 'chelovekpauk', { expiresIn: 300 })
+      res.json({token: 'JWT ' + token})
+    }
+    else {
+      res.send(401)
+    }
+  })
 
-//   app.post('/token/reject', function (req, res, next) { 
-//     var refreshToken = req.body.refreshToken 
-//     if(refreshToken in refreshTokens) { 
-//       delete refreshTokens[refreshToken]
-//     } 
-//     res.send(204) 
-//   })
+  router.post('/token/reject', function (req, res, next) { 
+    var refreshToken = req.body.refreshToken 
+    if(refreshToken in refreshTokens) { 
+      delete refreshTokens[refreshToken]
+    } 
+    res.send(204) 
+  })
 
 module.exports = router;
