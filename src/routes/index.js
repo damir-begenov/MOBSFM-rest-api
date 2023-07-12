@@ -47,7 +47,6 @@ router.get('/news', (req,res) => {
 
 router.post('/checkSession', (req, res) => {
     const {iin} = req.body;
-    console.log(iin);
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         if (user) {
@@ -81,10 +80,9 @@ router.post('/checkSession', (req, res) => {
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
                 const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document[type_document_id]]) || null;
                 const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
-
+                console.log(user_document);
                 organization_instance.subjectCode = subjectCode['name'];
                 organization_instance.orgType = orgType['type'];
-                console.log(docType);
                 user.docType = docType['name'];
                 user.docNumber = user_document['number'];
                 user.docDateIssued = user_document['date_issue'];
