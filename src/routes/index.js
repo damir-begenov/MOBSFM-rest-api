@@ -79,7 +79,7 @@ router.post('/checkSession', (req, res) => {
                 user.docNumber = user_document['number'];
                 user.docDateIssued = user_document['date_issue'];
                 user.docIssuedBy = user_document['issued_by'];
-                user.docSeries = user_document['series'];
+                user.docSeries = user_document['series']
                 user.userRole = userRole['role'];
 
                 // Authentication successful
@@ -132,56 +132,43 @@ router.post('/login', (req, res) => {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
             console.log(organization)
             if (organization) {
-                const token = jwt.sign(
-                    { user_id: user._id, iin },
+                const xmlData = organization.xml_to_sign;
+                const organization_instance = new Organization(xmlData);
+                await organization_instance.parseXml();
 
-                    'chelovekpauk',
-                    {
-                        expiresIn: "2h",
-                    }
-                );
-                // save user token
-                user.token = token;
-                const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
-                console.log(organization)
-                if (organization) {
-                    const xmlData = organization.xml_to_sign;
-                    const organization_instance = new Organization(xmlData);
-                    await organization_instance.parseXml();
+                const parser = new xml2js.Parser();
+                const parsedData = await parser.parseStringPromise(xmlData);
+                const organisationData = parsedData.Data.Root[0].OrganisationData[0];
+                const additionalAcData = organisationData.AdditionalAcData[0];
 
-                    const parser = new xml2js.Parser();
-                    const parsedData = await parser.parseStringPromise(xmlData);
-                    const organisationData = parsedData.Data.Root[0].OrganisationData[0];
-                    const additionalAcData = organisationData.AdditionalAcData[0];
+                const cfmCode = organisationData.CfmCode[0]['_'];
 
-                    const cfmCode = organisationData.CfmCode[0]['_'];
+                const accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]);
+                const user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
+                const userId = user.user_id;
+                const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
+                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
+                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [accounts_document_id['document_id']]) || null;
+                const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
 
-                    const accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]);
-                    const user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
-                    const userId = user.user_id;
-                    const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
-                    const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
-                    const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [accounts_document_id['document_id']]) || null;
-                    const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
+                organization_instance.subjectCode = subjectCode['name'];
+                organization_instance.orgType = orgType['type'];
 
-                    organization_instance.subjectCode = subjectCode['name'];
-                    organization_instance.orgType = orgType['type'];
+                user.docType = docType && docType.name ? docType.name : null;
+                user.docNumber = user_document['number'];
+                user.docDateIssued = user_document['date_issue'];
+                user.docIssuedBy = user_document['issued_by'];
+                user.docSeries = user_document['series']
+                user.userRole = userRole['role'];
 
-                    user.docType = docType && docType.name ? docType.name : null;
-                    user.docNumber = user_document['number'];
-                    user.docDateIssued = user_document['date_issue'];
-                    user.docIssuedBy = user_document['issued_by'];
-                    user.docSeries = user_document['series'];
-                    user.userRole = userRole['role'];
-
-                    // Authentication successful
-                    res.json({
-                        success: true,
-                        message: 'Login successful',
-                        user: user,
-                        organization_xml: organization_instance,
-                        organization: organization,
-                    });
+                // Authentication successful
+                res.json({
+                    success: true,
+                    message: 'Login successful',
+                    user: user,
+                    organization_xml: organization_instance,
+                    organization: organization,
+                });
             } else {
                 // Organization not found
                 res.status(404).json({ success: false, message: 'Organization not found' });
