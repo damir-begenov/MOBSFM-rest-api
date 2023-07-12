@@ -29,7 +29,7 @@ router.get('/news', (req, res) => {
         if (user && user.id === password) {
             const token = jwt.sign(
                 { user_id: user._id, email },
-                process.env.TOKEN_KEY,
+                'chelovekpauk',
                 {
                   expiresIn: "2h",
                 }
