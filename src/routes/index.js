@@ -22,7 +22,7 @@ router.get('/api', (req, res) => {
 
 router.get('/education', (req, res) => {
     db.task(async t => {
-        const education_category = await t.manyOrNone('SELECT * FROM education_educationmaterial')
+        const education_category = await t.manyOrNone('SELECT * FROM education_educationmaterial INNER JOIN education_educationfile ON education_educationmaterial.id = education_educationfile.category_id')
         res.json({
             education: education_category
         })
