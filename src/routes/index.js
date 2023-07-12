@@ -38,7 +38,6 @@ router.post('/checkSession', (req, res) => {
     console.log(iin);
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
-        console.log(user)
         if (user) {
             const token = jwt.sign(
                 { user_id: user._id, iin },
@@ -51,7 +50,7 @@ router.post('/checkSession', (req, res) => {
               // save user token
               user.token = token;
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
-            console.log(organization)
+
             if (organization) {
                 const xmlData = organization.xml_to_sign;
                 const organization_instance = new Organization(xmlData);
@@ -60,7 +59,6 @@ router.post('/checkSession', (req, res) => {
                 const parser = new xml2js.Parser();
                 const parsedData = await parser.parseStringPromise(xmlData);
                 const organisationData = parsedData.Data.Root[0].OrganisationData[0];
-                const additionalAcData = organisationData.AdditionalAcData[0];
 
                 const cfmCode = organisationData.CfmCode[0]['_'];
 
@@ -82,6 +80,8 @@ router.post('/checkSession', (req, res) => {
                 user.docSeries = user_document['series']
                 user.userRole = userRole['role'];
 
+                console.log(user);
+                console.log(organization);
                 // Authentication successful
                 res.json({
                     success: true,
