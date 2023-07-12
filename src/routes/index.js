@@ -33,6 +33,18 @@ router.get('/education', (req, res) => {
     });
 });
 
+router.get('/news', (req,res) => {
+    db.task(async t => {
+        const news = await t.manyOrNone('SELECT * FROM news_news');
+
+        res.json({
+            news: news
+        })
+    }).catch(error =>{
+        res.status(500).json({success: false});
+    })
+})
+
 router.post('/checkSession', (req, res) => {
     const {iin} = req.body;
     console.log(iin);
