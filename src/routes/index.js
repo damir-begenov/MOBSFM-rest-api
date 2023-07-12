@@ -21,7 +21,7 @@ router.get('/api', (req, res) => {
     });
 });
 
-router.get('/checkSession', (req, res) => {
+router.post('/checkSession', (req, res) => {
     const {iin} = req.body;
     console.log(iin);
     db.task(async t => {
