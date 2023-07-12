@@ -84,7 +84,7 @@ router.post('/checkSession', (req, res) => {
 
                 organization_instance.subjectCode = subjectCode['name'];
                 organization_instance.orgType = orgType['type'];
-
+                console.log(docType);
                 user.docType = docType['name'];
                 user.docNumber = user_document['number'];
                 user.docDateIssued = user_document['date_issue'];
