@@ -80,7 +80,11 @@ router.post('/checkSession', (req, res) => {
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
                 const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]) || null;
                 const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
-                console.log(user_document);
+
+                date_issue = user_document['date_issue'].toString();
+                console.log(date_issue);
+
+
                 organization_instance.subjectCode = subjectCode['name'];
                 organization_instance.orgType = orgType['type'];
                 user.docType = docType['name'];
