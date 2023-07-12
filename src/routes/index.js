@@ -6,7 +6,7 @@ const Organization = require('../classes/organization.js');
 require('dotenv').config();
 
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
-const connectionString = `postgres://${DB_USERNAME}:${encodeURIComponent(DB_PASSWORD)}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const db = pgp(connectionString);
 
 
@@ -37,17 +37,27 @@ router.post('/login', (req, res) => {
                 const parser = new xml2js.Parser();
                 const parsedData = await parser.parseStringPromise(xmlData);
                 const organisationData = parsedData.Data.Root[0].OrganisationData[0];
-                const cfmCode = organisationData.CfmCode[0];
+                const additionalAcData = organisationData.AdditionalAcData[0];
+
+
+                const cfmCode = organisationData.CfmCode[0]['_'];
+                const docId = additionalAcData.DocumentIdentity[0]['_'];
+                const userId = user.user_id;
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
+                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [docId]);
+                const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
                 // Authentication successful
                 res.json({
                     success: true,
                     message: 'Login successful',
                     user: user,
-                    organization: organization_instance,
+                    organization_xml: organization_instance,
+                    organization: organization,
                     subjectCode: subjectCode,
-                    orgType: orgType
+                    orgType: orgType,
+                    docType: docType,
+                    userRole: userRole
                 });
             } else {
                 // Organization not found
