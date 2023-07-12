@@ -22,9 +22,11 @@ router.get('/api', (req, res) => {
 
 router.get('/education', (req, res) => {
     db.task(async t => {
-        const education_category = await t.manyOrNone('SELECT * FROM education_educationmaterial INNER JOIN education_category ON education_educationmaterial.category_id = education_category.id')
+        const education_category = await t.manyOrNone('SELECT * FROM education_category');
+        const education_category_material = await t.manyOrNone('SELECT * FROM education_educationmaterial INNER JOIN education_category ON education_educationmaterial.category_1_id = education_category.id')
         res.json({
-            education: education_category
+            education_category: education_category,
+            education_category_material: education_category_material
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error' });
