@@ -172,6 +172,8 @@ router.post('/login', (req, res) => {
                 org_address.country = org_country;
                 org_address.district = org_district;
                 org_address.region = org_region;
+                delete org_address.region_id;
+                delete org_address.district_id;
                 organization_instance.address = org_address;
 
                 user.docType = docType['name'];
