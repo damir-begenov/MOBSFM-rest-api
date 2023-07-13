@@ -169,11 +169,10 @@ router.post('/login', (req, res) => {
                 const org_region = await t.oneOrNone('SELECT * FROM directories_region WHERE id = $1', [org_address['region_id']]);
                 organization_instance.subjectCode = subjectCode['name'];
                 organization_instance.orgType = orgType['type'];
-
+                org_address.country = org_country;
+                org_address.district = org_district;
+                org_address.region = org_region;
                 organization_instance.address = org_address;
-                organization_instance.country = org_country;
-                organization_instance.district = org_district;
-                organization_instance.region = org_region;
 
                 user.docType = docType['name'];
                 user.docNumber = user_document['number'];
