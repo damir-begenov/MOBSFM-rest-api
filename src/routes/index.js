@@ -162,15 +162,26 @@ router.post('/login', (req, res) => {
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
                 const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]) || null;
                 const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
+                const org_address = await t.oneOrNone('SELECT * FROM accounts_organizationaddres WHERE organization_id = $1', [organization['id']]);
+                const org_country = await t.oneOrNone('SELECT * FROM directories_country WHERE id = $1', [organization['country_id']]);
+                const org_district = await t.oneOrNone('SELECT * FROM directories_district WHERE id = $1', [organization['district_id']]);
 
                 organization_instance.subjectCode = subjectCode['name'];
                 organization_instance.orgType = orgType['type'];
+
+                organization_instance.address = org_address;
+                organization_instance.country = org_country;
+                organization_instance.district = org_district;
+
+
                 user.docType = docType['name'];
                 user.docNumber = user_document['number'];
                 user.docDateIssued = user_document['date_issue'];
                 user.docIssuedBy = user_document['issued_by'];
                 user.docSeries = user_document['series']
                 user.userRole = userRole['role'];
+
+
 
                 console.log(user);
                 console.log(organization);

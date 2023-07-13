@@ -17,17 +17,6 @@ class Organization {
         this.org_firstName = null;
         this.org_secondName = null;
         this.org_middleName = null;
-        this.org_documentIdentity = null;
-        this.org_seriesDocIdentity = null;
-        this.org_numberDocIdentity = null;
-        this.org_documentIssued = null;
-        this.org_dateIssuance = null;
-        this.postalIndex = null;
-        this.areaCode = null;
-        this.districtCode = null;
-        this.street = null;
-        this.house = null;
-        this.office = null;
         this.persons = null;
    }
 
@@ -53,13 +42,6 @@ class Organization {
             this.org_firstName = additionalAcData.FirstName[0] || null;
             this.org_secondName = additionalAcData.SecondName[0] || null;
             this.org_middleName = additionalAcData.MiddleName[0] || null;
-
-            this.postalIndex = organisationData.PostalIndex[0] || null;
-            this.areaCode = organisationData.Area[0]['$'].Code || null;
-            this.districtCode = organisationData.District[0]['$'].Code || null;
-            this.street = organisationData.Street[0] || null;
-            this.house = organisationData.House[0] || null;
-            this.office = organisationData.Office[0] || null;
 
             const personElements = organisationData.Persons[0].Person;
             this.persons = personElements.map(personElement => {
