@@ -20,6 +20,20 @@ router.get('/api', (req, res) => {
     });
 });
 
+router.get('/', (req, res) => {
+    db.task(async t => {
+        const risk = await t.manyOrNone('SELECT * FROM mutual_evaluation_mutualevalutionmaterialcategory');
+        const risk_category_material = await t.manyOrNone('SELECT ec.name as nameaac, ec.name_kk as nameaac_kk, eem.* , eef.file as filee FROM mutual_evaluation_mutualevalutionmaterial AS eem INNER JOIN mutual_evaluation_muterialfile AS eef ON eem.id = eef.material_id INNER JOIN mutual_evaluation_mutualevalutionmaterialcategory AS ec ON eem.category_id = ec.id')
+
+        res.json({
+            risk: risk,
+            risk_category_material: risk_category_material
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    });
+})
+
 router.get('/education', (req, res) => {
     db.task(async t => {
         const education_category = await t.manyOrNone('SELECT * FROM education_category');
