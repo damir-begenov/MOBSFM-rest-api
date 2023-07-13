@@ -32,9 +32,7 @@ router.get('/risk', (req, res) => {
             risk: risk,
             risk_category_material: risk_category_material
         })
-    }).catch(error => {
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    });
+    })
 })
 
 router.get('/education', (req, res) => {
