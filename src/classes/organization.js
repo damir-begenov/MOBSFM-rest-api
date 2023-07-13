@@ -17,7 +17,6 @@ class Organization {
         this.org_firstName = null;
         this.org_secondName = null;
         this.org_middleName = null;
-        this.persons = null;
    }
 
     async parseXml() {
@@ -43,28 +42,6 @@ class Organization {
             this.org_secondName = additionalAcData.SecondName[0] || null;
             this.org_middleName = additionalAcData.MiddleName[0] || null;
 
-            const personElements = organisationData.Persons[0].Person;
-            this.persons = personElements.map(personElement => {
-                const firstName = personElement.FirstName[0] || null;
-                const secondName = personElement.SecondName[0] || null;
-                const middleName = personElement.MiddleName[0] || null;
-                const individualNumber = personElement.IndividualNumber[0] || null;
-                const jobName = personElement.JobName[0] || null;
-                const phone = personElement.Phone[0] || null;
-                const email = personElement.Email[0] || null;
-                const certificate = personElement.Certificate[0] || null;
-
-                return {
-                    firstName,
-                    secondName,
-                    middleName,
-                    individualNumber,
-                    jobName,
-                    phone,
-                    email,
-                    certificate
-                };
-            }) || null;
 
             // Return the organization instance with parsed data
             return this;
