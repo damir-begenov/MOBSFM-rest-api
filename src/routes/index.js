@@ -138,7 +138,6 @@ var refreshTokens = {}
 
 router.post('/login', (req, res) => {
     const { iin, password } = req.body;
-    console.log(req.body)
     // Query the database to validate the user's credentials and fetch additional data
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
@@ -155,10 +154,8 @@ router.post('/login', (req, res) => {
         var refreshToken = randtoken.uid(256) 
         refreshTokens[refreshToken] = iin;
         user.refreshToken = refreshToken;
-        console.log(user)
         if (user && user.id === password) {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
-            console.log(organization)
             if (organization) {
 
 
@@ -169,7 +166,6 @@ router.post('/login', (req, res) => {
                 let accounts_document_id = null;
 
                 accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]);
-                console.log(accounts_document_id);
                 if(accounts_document_id['document_id'] != null){
                     user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
                     docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]);
@@ -203,7 +199,8 @@ router.post('/login', (req, res) => {
                 user.docSeries = user_document['series']
                 user.userRole = userRole['role'];
 
-
+                console.log(user)
+                console.log(organization)
                 // Authentication successful
                 res.json({
                     success: true,
