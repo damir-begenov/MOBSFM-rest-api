@@ -201,7 +201,7 @@ router.post('/login', (req, res) => {
                 }
 
                 const userId = user.user_id;
-                const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
+                const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE id = $1', [cfmCode]);
 
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
                 const userRole = await t.many('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
