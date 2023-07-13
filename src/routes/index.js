@@ -21,7 +21,6 @@ router.get('/api', (req, res) => {
 });
 
 router.get('/risk', (req, res) => {
-    console.log('fesfsefe');
     db.task(async t => {
         const risk = await t.manyOrNone('SELECT * FROM mutual_evaluation_mutualevaluationmaterialcategory');
         console.log(risk);
@@ -38,16 +37,12 @@ router.get('/risk', (req, res) => {
 })
 
 router.get('/fatf', (req, res) => {
-    console.log('fesfsefe');
     db.task(async t => {
-        const risk = await t.manyOrNone('SELECT * FROM fatfs_fatfcategory');
-        console.log(risk);
-
-        const risk_category_material = await t.manyOrNone('SELECT ec.name as nameaac, ec.name_kk as nameaac_kk, eem.* , eef.file as filee FROM fatfs_fatfmaterial AS eem INNER JOIN fatfs_fatffile AS eef ON eem.id = eef.material_id INNER JOIN fatfs_fatfcategory AS ec ON eem.category_id = ec.id')
-        console.log(risk);
+        const fatf = await t.manyOrNone('SELECT * FROM fatfs_fatfcategory');
+        const fatfs_fatfcategory = await t.manyOrNone('SELECT ec.name as nameaac, ec.name_kk as nameaac_kk, eem.* , eef.file as filee FROM fatfs_fatfmaterial AS eem INNER JOIN fatfs_fatffile AS eef ON eem.id = eef.material_id INNER JOIN fatfs_fatfcategory AS ec ON eem.category_id = ec.id')
         res.json({
-            risk: risk,
-            risk_category_material: risk_category_material
+            fatf: fatf,
+            fatf_category_material: fatfs_fatfcategory
         })
     }).catch(err => {
         res.status(500).json({ success: false, message: 'Internal server error' });
