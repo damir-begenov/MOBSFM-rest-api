@@ -21,8 +21,11 @@ router.get('/api', (req, res) => {
 });
 
 router.get('/risk', (req, res) => {
+    console.log('fesfsefe');
     db.task(async t => {
         const risk = await t.manyOrNone('SELECT * FROM mutual_evaluation_mutualevalutionmaterialcategory');
+        console.log(risk);
+
         const risk_category_material = await t.manyOrNone('SELECT ec.name as nameaac, ec.name_kk as nameaac_kk, eem.* , eef.file as filee FROM mutual_evaluation_mutualevalutionmaterial AS eem INNER JOIN mutual_evaluation_muterialfile AS eef ON eem.id = eef.material_id INNER JOIN mutual_evaluation_mutualevalutionmaterialcategory AS ec ON eem.category_id = ec.id')
         console.log(risk);
         res.json({
