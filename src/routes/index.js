@@ -164,12 +164,14 @@ router.post('/login', (req, res) => {
 
 
                 const cfmCode = organization['subject_code_id'];
-                const docType = null;
-                const user_document = null;
-                const accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]) || null;
+                let docType = null;
+                let user_document = null;
+                let accounts_document_id = null;
+
+                accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]) || null;
                 if(accounts_document_id != null){
-                    const user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
-                    const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]) || null;
+                    user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
+                    docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]) || null;
                 }
 
                 const userId = user.user_id;
