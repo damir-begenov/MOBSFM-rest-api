@@ -160,15 +160,10 @@ router.post('/login', (req, res) => {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
             console.log(organization)
             if (organization) {
-                const xmlData = organization.xml_to_sign;
-                const organization_instance = new Organization(xmlData);
-                await organization_instance.parseXml();
 
-                const parser = new xml2js.Parser();
-                const parsedData = await parser.parseStringPromise(xmlData);
-                const organisationData = parsedData.Data.Root[0].OrganisationData[0];
 
-                const cfmCode = organisationData.CfmCode[0]['_'];
+
+                const cfmCode = organization['subject_code_id'];
 
                 const accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]);
                 const user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
@@ -184,15 +179,15 @@ router.post('/login', (req, res) => {
 
                 const persons = await t.many('SELECT * FROM accounts_employee a INNER JOIN accounts_clientuser b on a.client_user_id = b.id WHERE a.organization_id = $1',[organization['id']]);
 
-                organization_instance.persons = persons;
-                organization_instance.subjectCode = subjectCode['name'];
-                organization_instance.orgType = orgType['type'];
+                organization.persons = persons;
+                organization.subjectCode = subjectCode['name'];
+                organization.orgType = orgType['type'];
                 org_address.country = org_country;
                 org_address.district = org_district;
                 org_address.region = org_region;
                 delete org_address.region_id;
                 delete org_address.district_id;
-                organization_instance.address = org_address;
+                organization.address = org_address;
 
                 user.docType = docType['name'];
                 user.docNumber = user_document['number'];
@@ -208,7 +203,6 @@ router.post('/login', (req, res) => {
                     success: true,
                     message: 'Login successful',
                     user: user,
-                    organization_xml: organization_instance,
                     organization: organization,
                 });
             } else {
