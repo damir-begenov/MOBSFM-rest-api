@@ -67,55 +67,61 @@ router.post('/checkSession', (req, res) => {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
 
             if (organization) {
-                const xmlData = organization.xml_to_sign;
-                const organization_instance = new Organization(xmlData);
-                await organization_instance.parseXml();
+                const cfmCode = organization['subject_code_id'];
+                let docType = null;
+                let user_document = null;
+                let accounts_document_id = null;
+                let org_address = null;
+                let org_country = null;
+                let org_district = null;
+                let org_region = null;
 
-                const parser = new xml2js.Parser();
-                const parsedData = await parser.parseStringPromise(xmlData);
-                const organisationData = parsedData.Data.Root[0].OrganisationData[0];
+                accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]);
+                if(accounts_document_id['document_id'] != null){
+                    user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
+                    docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]);
+                    user.docType = docType['name'];
+                    user.docNumber = user_document['number'];
+                    user.docDateIssued = user_document['date_issue'];
+                    user.docIssuedBy = user_document['issued_by'];
+                    user.docSeries = user_document['series']
+                }
 
-                const cfmCode = organisationData.CfmCode[0]['_'];
-
-                const accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]);
-                const user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
                 const userId = user.user_id;
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
+
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
-                const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]) || null;
-                const userRole = await t.oneOrNone('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
-                const org_address = await t.oneOrNone('SELECT * FROM accounts_organizationaddres WHERE organization_id = $1', [organization['id']]);
-                const org_country = await t.oneOrNone('SELECT * FROM directories_country WHERE id = $1', [org_address['country_id']]);
-                const org_district = await t.oneOrNone('SELECT * FROM directories_district WHERE id = $1', [org_address['district_id']]);
-                const org_region = await t.oneOrNone('SELECT * FROM directories_region WHERE id = $1', [org_address['region_id']]);
+                const userRole = await t.many('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
+                org_address = await t.oneOrNone('SELECT * FROM accounts_organizationaddres WHERE organization_id = $1', [organization['id']]);
+
+                if(org_address!=null){
+                    org_country = await t.oneOrNone('SELECT * FROM directories_country WHERE id = $1', [org_address['country_id']]);
+                    org_district = await t.oneOrNone('SELECT * FROM directories_district WHERE id = $1', [org_address['district_id']]);
+                    org_region = await t.oneOrNone('SELECT * FROM directories_region WHERE id = $1', [org_address['region_id']]);
+                    org_address.country = org_country;
+                    org_address.district = org_district;
+                    org_address.region = org_region;
+                    delete org_address.region_id;
+                    delete org_address.district_id;
+                }
+
 
                 const persons = await t.many('SELECT * FROM accounts_employee a INNER JOIN accounts_clientuser b on a.client_user_id = b.id WHERE a.organization_id = $1',[organization['id']]);
 
-                organization_instance.persons = persons;
-                organization_instance.subjectCode = subjectCode['name'];
-                organization_instance.orgType = orgType['type'];
-                org_address.country = org_country;
-                org_address.district = org_district;
-                org_address.region = org_region;
-                delete org_address.region_id;
-                delete org_address.district_id;
-                organization_instance.address = org_address;
+                organization.persons = persons;
+                organization.subjectCode = subjectCode;
+                organization.orgType = orgType['type'];
+                organization.address = org_address;
 
-                user.docType = docType['name'];
-                user.docNumber = user_document['number'];
-                user.docDateIssued = user_document['date_issue'];
-                user.docIssuedBy = user_document['issued_by'];
-                user.docSeries = user_document['series']
                 user.userRole = userRole['role'];
 
-                console.log(user);
-                console.log(organization);
+                console.log(user)
+                console.log(organization)
                 // Authentication successful
                 res.json({
                     success: true,
                     message: 'Login successful',
                     user: user,
-                    organization_xml: organization_instance,
                     organization: organization,
                 });
             } else {
@@ -157,8 +163,6 @@ router.post('/login', (req, res) => {
         if (user && user.id === password) {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
             if (organization) {
-
-
 
                 const cfmCode = organization['subject_code_id'];
                 let docType = null;
