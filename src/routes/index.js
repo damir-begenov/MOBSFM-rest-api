@@ -32,8 +32,28 @@ router.get('/risk', (req, res) => {
             risk: risk,
             risk_category_material: risk_category_material
         })
+    }).catch(err => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
     })
 })
+
+router.get('/fatf', (req, res) => {
+    console.log('fesfsefe');
+    db.task(async t => {
+        const risk = await t.manyOrNone('SELECT * FROM fatfs_fatfcategory');
+        console.log(risk);
+
+        const risk_category_material = await t.manyOrNone('SELECT ec.name as nameaac, ec.name_kk as nameaac_kk, eem.* , eef.file as filee FROM fatfs_fatfmaterial AS eem INNER JOIN fatfs_fatffile AS eef ON eem.id = eef.material_id INNER JOIN fatfs_fatfcategory AS ec ON eem.category_id = ec.id')
+        console.log(risk);
+        res.json({
+            risk: risk,
+            risk_category_material: risk_category_material
+        })
+    }).catch(err => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    })
+})
+
 
 router.get('/education', (req, res) => {
     db.task(async t => {
