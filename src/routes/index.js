@@ -26,7 +26,7 @@ router.get('/risk', (req, res) => {
         const risk = await t.manyOrNone('SELECT * FROM mutual_evaluation_mutualevaluationmaterialcategory');
         console.log(risk);
 
-        const risk_category_material = await t.manyOrNone('SELECT ec.name as nameaac, ec.name_kk as nameaac_kk, eem.* , eef.file as filee FROM mutual_evaluation_mutualevalutionmaterial AS eem INNER JOIN mutual_evaluation_muterialfile AS eef ON eem.id = eef.material_id INNER JOIN mutual_evaluation_mutualevalutionmaterialcategory AS ec ON eem.category_id = ec.id')
+        const risk_category_material = await t.manyOrNone('SELECT ec.name as nameaac, ec.name_kk as nameaac_kk, eem.* , eef.file as filee FROM mutual_evaluation_mutualevaluationmaterial AS eem INNER JOIN mutual_evaluation_muterialfile AS eef ON eem.id = eef.material_id INNER JOIN mutual_evaluation_mutualevaluationmaterialcategory AS ec ON eem.category_id = ec.id')
         console.log(risk);
         res.json({
             risk: risk,
