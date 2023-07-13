@@ -186,6 +186,11 @@ router.post('/login', (req, res) => {
                     org_country = await t.oneOrNone('SELECT * FROM directories_country WHERE id = $1', [org_address['country_id']]);
                     org_district = await t.oneOrNone('SELECT * FROM directories_district WHERE id = $1', [org_address['district_id']]);
                     org_region = await t.oneOrNone('SELECT * FROM directories_region WHERE id = $1', [org_address['region_id']]);
+                    org_address.country = org_country;
+                    org_address.district = org_district;
+                    org_address.region = org_region;
+                    delete org_address.region_id;
+                    delete org_address.district_id;
                 }
 
 
@@ -194,11 +199,6 @@ router.post('/login', (req, res) => {
                 organization.persons = persons;
                 organization.subjectCode = subjectCode;
                 organization.orgType = orgType['type'];
-                org_address.country = org_country;
-                org_address.district = org_district;
-                org_address.region = org_region;
-                delete org_address.region_id;
-                delete org_address.district_id;
                 organization.address = org_address;
 
                 user.docType = docType['name'];
