@@ -35,7 +35,7 @@ router.get('/education', (req, res) => {
 
 router.get('/news', (req,res) => {
     db.task(async t => {
-        const news = await t.manyOrNone('SELECT * FROM news_news');
+        const news = await t.manyOrNone('SELECT * FROM news_news WHERE authorized = false');
 
         res.json({
             news: news
