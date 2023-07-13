@@ -25,7 +25,7 @@ class Organization {
             const parsedData = await parser.parseStringPromise(this.xmlData);
             const organisationData = parsedData.Data.Root[0].OrganisationData[0];
             
-            this.cfmCode = organisationData.CfmCode[0];
+            this.cfmCode = organisationData.CfmCode[0] || null;
             this.opfCode = organisationData.OpfCode[0] || null;
             this.orgName = organisationData.OrgName[0] || null;
             this.shortName = organisationData.ShortName[0] || null;
@@ -37,7 +37,7 @@ class Organization {
             this.registerNumber = organisationData.RegisterNumber[0] || null;
             this.registerAgency = organisationData.RegisterAgency[0] || null;
 
-            const additionalAcData = organisationData.AdditionalAcData[0];
+            const additionalAcData = organisationData.AdditionalAcData[0] || null;
             this.org_firstName = additionalAcData.FirstName[0] || null;
             this.org_secondName = additionalAcData.SecondName[0] || null;
             this.org_middleName = additionalAcData.MiddleName[0] || null;
