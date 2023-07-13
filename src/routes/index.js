@@ -39,7 +39,7 @@ router.get('/risk', (req, res) => {
 router.get('/fatf', (req, res) => {
     db.task(async t => {
         const fatf = await t.manyOrNone('SELECT * FROM fatfs_fatfcategory');
-        const fatfs_fatfcategory = await t.manyOrNone('SELECT ec.name as nameaac, ec.name_kk as nameaac_kk, eem.* , eef.file as filee FROM fatfs_fatfmaterial AS eem INNER JOIN fatfs_fatffile AS eef ON eem.id = eef.material_id INNER JOIN fatfs_fatfcategory AS ec ON eem.category_id = ec.id')
+        const fatfs_fatfcategory = await t.manyOrNone('SELECT * FROM fatfs_fatfcategory INNER JOIN fatfs_fatfmaterial ON fatfs_fatfcategory.id = fatfs_fatfmaterial.material_id')
         res.json({
             fatf: fatf,
             fatf_category_material: fatfs_fatfcategory
