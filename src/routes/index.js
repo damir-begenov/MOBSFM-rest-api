@@ -39,11 +39,11 @@ router.get('/risk', (req, res) => {
 router.get('/fatf', (req, res) => {
     db.task(async t => {
         const fatf = await t.manyOrNone('SELECT * FROM fatfs_fatfcategory');
-        const fatfs_fatfcategory = await t.manyOrNone('SELECT * FROM fatfs_fatfcategory INNER JOIN fatfs_fatfmaterial ON fatfs_fatfcategory.id = fatfs_fatfmaterial.material_id')
         res.json({
             fatf: fatf,
-            fatf_category_material: fatfs_fatfcategory
         })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
     });
 })
 
