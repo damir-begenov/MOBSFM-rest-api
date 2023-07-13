@@ -44,9 +44,7 @@ router.get('/fatf', (req, res) => {
             fatf: fatf,
             fatf_category_material: fatfs_fatfcategory
         })
-    }).catch(err => {
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    })
+    });
 })
 
 
