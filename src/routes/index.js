@@ -166,7 +166,7 @@ router.post('/login', (req, res) => {
                 const cfmCode = organization['subject_code_id'];
                 const docType = null;
                 const user_document = null;
-                const accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]);
+                const accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]) || null;
                 if(accounts_document_id != null){
                     const user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
                     const docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]) || null;
