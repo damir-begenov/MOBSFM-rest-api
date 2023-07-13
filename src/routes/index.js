@@ -178,8 +178,6 @@ router.post('/login', (req, res) => {
                 const userId = user.user_id;
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE code = $1', [cfmCode]);
 
-                console.log(subjectCode)
-
                 const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
                 const userRole = await t.many('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
                 org_address = await t.oneOrNone('SELECT * FROM accounts_organizationaddres WHERE organization_id = $1', [organization['id']]);
@@ -194,7 +192,7 @@ router.post('/login', (req, res) => {
                 const persons = await t.many('SELECT * FROM accounts_employee a INNER JOIN accounts_clientuser b on a.client_user_id = b.id WHERE a.organization_id = $1',[organization['id']]);
 
                 organization.persons = persons;
-                organization.subjectCode = subjectCode['name'];
+                organization.subjectCode = subjectCode;
                 organization.orgType = orgType['type'];
                 org_address.country = org_country;
                 org_address.district = org_district;
