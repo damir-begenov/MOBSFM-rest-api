@@ -180,6 +180,7 @@ router.post('/login', (req, res) => {
             if (organization) {
 
                 const cfmCode = organization['subject_code_id'];
+                console.log(cfmCode)
                 let docType = null;
                 let user_document = null;
                 let accounts_document_id = null;
