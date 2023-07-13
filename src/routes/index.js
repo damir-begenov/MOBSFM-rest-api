@@ -211,7 +211,7 @@ router.post('/login', (req, res) => {
                 organization.orgType = orgType['type'];
                 organization.address = org_address;
 
-                user.userRole = userRole['role'];
+                user.userRole = userRole[0]['role'];
 
                 console.log(user)
                 console.log(organization)
