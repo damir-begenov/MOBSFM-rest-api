@@ -61,6 +61,17 @@ router.get('/faq', (req, res) => {
 })
 
 
+router.get('/registry', (req, res) => {
+    db.task(async t => {
+        const registry = await t.manyOrNone('SELECT * FROM registry_registercontrolledentities');
+        res.json({
+            registry: registry,
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    });
+})
+
 
 
 router.get('/education', (req, res) => {
