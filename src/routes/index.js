@@ -49,8 +49,10 @@ router.get('/fatf', (req, res) => {
 
 router.get('/faq', (req, res) => {
     db.task(async t => {
+        const faq_category = await t.manyOrNone('SELECT * FROM category_faq');
         const faq = await t.manyOrNone('SELECT * FROM category_faq INNER JOIN faq ON faq.category_id = category_faq.id');
         res.json({
+            faq_category: faq_category,
             faq: faq,
         })
     }).catch(error => {
