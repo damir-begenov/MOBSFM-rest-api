@@ -47,6 +47,19 @@ router.get('/fatf', (req, res) => {
     });
 })
 
+router.get('/faq', (req, res) => {
+    db.task(async t => {
+        const faq = await t.manyOrNone('SELECT * FROM category_faq INNER JOIN faq ON faq.category_id = category_faq.id');
+        res.json({
+            faq: faq,
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    });
+})
+
+
+
 
 router.get('/education', (req, res) => {
     db.task(async t => {
