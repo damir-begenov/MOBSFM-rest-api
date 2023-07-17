@@ -23,11 +23,10 @@ router.get('/api', (req, res) => {
 router.post('/certificate', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
-        const certificate_main = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1 and type_certificate = \'main\'',[organization_id]);
+        const certificate_main = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1 ',[organization_id]);
         const certificate_additional = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1 and type_certificate = \'additional\'',[organization_id]);
         res.json({
             certificate_main: certificate_main,
-            certificate_additional: certificate_additional
         })
     });
 });
