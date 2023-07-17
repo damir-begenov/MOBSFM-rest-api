@@ -26,7 +26,7 @@ router.get('/certificate', (req, res) => {
         const certificate_main = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1 and type_certificate = \'main\'',[organization_id]);
         const certificate_additional = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1 and type_certificate = \'additional\'',[organization_id]);
         res.json({
-            certificate: certificate,
+            certificate_main: certificate_main,
             certificate_additional: certificate_additional
         })
     });
