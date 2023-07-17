@@ -244,7 +244,7 @@ router.post('/login', (req, res) => {
             }
             if(organization === null){
                 const organization_emp = await t.oneOrNone('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']]);
-                organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE organization_id = $1', [organization_emp['organization_id']]);
+                organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [organization_emp['organization_id']]);
             }
 
             if (organization) {
