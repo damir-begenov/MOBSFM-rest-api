@@ -20,22 +20,22 @@ router.get('/api', (req, res) => {
     });
 });
 
-router.post('certificate', (req, res) => {
+router.get('/certificate', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
         const certificate = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1',[organization_id]);
         res.json({
-            certificate: certificate
+            certificate: certificate,
         })
     });
 });
 
-router.get('regulatory_document', (req, res) => {
+router.get('/regulatory_document', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
         const regulatory_document = await t.manyOrNone('SELECT * FROM regulatory_document where organization_id = $1',[organization_id]);
         res.json({
-            regulatory_document: regulatory_document
+            regulatory_document: regulatory_document,
         })
     });
 });
