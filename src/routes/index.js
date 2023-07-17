@@ -23,11 +23,10 @@ router.get('/api', (req, res) => {
 router.post('/certificate', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
-        const certificate_main = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1 and type_certificate = \'main\'',[organization_id]);
+        const certificate_main = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1 ',[organization_id]);
         const certificate_additional = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1 and type_certificate = \'additional\'',[organization_id]);
         res.json({
             certificate_main: certificate_main,
-            certificate_additional: certificate_additional
         })
     });
 });
@@ -221,7 +220,6 @@ router.post('/login', (req, res) => {
     const { iin, password } = req.body;
     // Query the database to validate the user's credentials and fetch additional data
     db.task(async t => {
-        let organization = null;
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
         const token = jwt.sign(
             { user_id: user.iin, iin },
@@ -237,16 +235,7 @@ router.post('/login', (req, res) => {
         refreshTokens[refreshToken] = iin;
         user.refreshToken = refreshToken;
         if (user && user.id === password) {
-            try{
-                organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
-            }catch (e){
-                print(e);
-            }
-            if(organization === null){
-                const organization_emp = await t.oneOrNone('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']]);
-                organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [organization_emp['organization_id']]);
-            }
-
+            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
             if (organization) {
                 const cfmCode = organization['subject_code_id'];
                 let docType = null;
@@ -271,8 +260,8 @@ router.post('/login', (req, res) => {
                 const userId = user.user_id;
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE id = $1', [cfmCode]);
 
-                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]) ?? '';
-                const userRole = await t.many('SELECT role FROM accounts_employee WHERE client_user_id = $1', [user.id]);
+                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
+                const userRole = await t.many('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
                 org_address = await t.oneOrNone('SELECT * FROM accounts_organizationaddres WHERE organization_id = $1', [organization['id']]);
                 if(org_address!=null){
                     org_country = await t.oneOrNone('SELECT * FROM directories_country WHERE id = $1', [org_address['country_id']]);
