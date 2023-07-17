@@ -20,7 +20,7 @@ router.get('/api', (req, res) => {
     });
 });
 
-router.get('/certificate', (req, res) => {
+router.post('/certificate', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
         const certificate_main = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1 and type_certificate = \'main\'',[organization_id]);
@@ -32,7 +32,7 @@ router.get('/certificate', (req, res) => {
     });
 });
 
-router.get('/regulatory_document', (req, res) => {
+router.post('/regulatory_document', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
         const regulatory_document = await t.manyOrNone('SELECT * FROM regulatory_document where organization_id = $1',[organization_id]);
