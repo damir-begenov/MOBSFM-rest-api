@@ -20,7 +20,7 @@ router.get('/api', (req, res) => {
     });
 });
 
-router.get('certificate', (req, res) => {
+router.post('certificate', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
         const certificate = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1',[organization_id]);
@@ -113,7 +113,6 @@ router.get('/education', (req, res) => {
 router.get('/news', (req,res) => {
     db.task(async t => {
         const news = await t.manyOrNone('SELECT * FROM news_news WHERE authorized = false');
-
         res.json({
             news: news
         })
