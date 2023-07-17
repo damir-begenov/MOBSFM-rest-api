@@ -35,7 +35,7 @@ router.post('/certificate', (req, res) => {
 router.post('/regulatory_document', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
-        const regulatory_document = await t.manyOrNone('SELECT * FROM regulatory_document where organization_id = $1',[organization_id]);
+        const regulatory_document = await t.manyOrNone('SELECT * FROM regulatory_document where organization_id = $1 and type_document = cur',[organization_id]);
         res.json({
             regulatory_document: regulatory_document,
         })
