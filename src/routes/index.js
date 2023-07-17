@@ -27,10 +27,8 @@ router.post('certificate', (req, res) => {
         res.json({
             certificate: certificate
         })
-    }).catch(err =>{
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    })
-})
+    });
+});
 
 router.get('regulatory_document', (req, res) => {
     const {organization_id} = req.body;
@@ -39,10 +37,8 @@ router.get('regulatory_document', (req, res) => {
         res.json({
             regulatory_document: regulatory_document
         })
-    }).catch(err =>{
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    })
-})
+    });
+});
 
 
 router.get('/risk', (req, res) => {
