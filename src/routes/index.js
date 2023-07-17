@@ -20,7 +20,7 @@ router.get('/api', (req, res) => {
     });
 });
 
-router.get('sertificate', (req, res) => {
+router.get('certificate', (req, res) => {
     const {iin} = req.body;
     db.task(async t => {
         const certificate = await t.manyOrNone('SELECT * FROM certificate where organization_id = $1',[iin]);
