@@ -149,7 +149,7 @@ router.post('/checkCountOrg', (req, res) => {
                 // Process each item here
                 list_ids.push(org['organization_id']);
             });
-            const organization = await t.many('SELECT * FROM accounts_organization WHERE id in $1', [list_ids]);
+            const organization = await t.many('SELECT * FROM accounts_organization WHERE id in [ $1 ]', list_ids.join(','));
             if (organization) {
 
                 res.json({
