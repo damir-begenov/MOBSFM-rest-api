@@ -143,13 +143,13 @@ router.post('/checkCountOrg', (req, res) => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         if (user) {
 
-            const organization = await t.many('SELECT * FROM accounts_organization WHERE id in (SELECT organization_id FROM accounts_employee WHERE client_user_id = $1)', [user['id']]);
+            const organization = await t.many('SELECT * FROM accounts_organization a + inner join directories_codetype b on  a.subject_code_id = b.id WHERE id in (SELECT organization_id FROM accounts_employee WHERE client_user_id = $1)', [user['id']]);
             if (organization) {
-            console.log(organization)
+
                 res.json({
                     success: true,
                     message: 'Checked for organizations',
-
+                    organization: organization,
                 });
             } else {
                 // Organization not found
