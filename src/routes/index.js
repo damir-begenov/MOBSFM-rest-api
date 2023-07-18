@@ -142,14 +142,8 @@ router.post('/checkCountOrg', (req, res) => {
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         if (user) {
-            list_ids = []
-            const org_id = await t.many('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']])
 
-            org_id.forEach(org => {
-                // Process each item here
-                list_ids.push(org['organization_id']);
-            });
-            const organization = await t.many('SELECT * FROM accounts_organization WHERE id in [ $1 ]', list_ids.join(','));
+            const organization = await t.many('SELECT * FROM accounts_organization WHERE id in (SELECT organization_id FROM accounts_employee WHERE client_user_id = $1)', [user['id']]);
             if (organization) {
 
                 res.json({
