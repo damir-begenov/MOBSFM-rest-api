@@ -236,9 +236,9 @@ router.post('/login', (req, res) => {
         refreshTokens[refreshToken] = iin;
         user.refreshToken = refreshToken;
         if (user && user.id === password) {
-            const org_id = await t.many('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']])
+            const org_id = await t.oneOrNone('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']])
             console.log(org_id)
-            const organization = await t.many('SELECT * FROM accounts_organization WHERE id in $1', [org_id[0]['organization_id']]);
+            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id in $1', [org_id['organization_id']]);
             console.log(organization)
             if (organization) {
                 const cfmCode = organization['subject_code_id'];
