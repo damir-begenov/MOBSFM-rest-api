@@ -162,7 +162,7 @@ router.post('/checkCountOrg', (req, res) => {
     })
         .catch(error => {
             console.error('Error occurred while checking in:', error);
-            res.status(500).json({ success: false, message: 'Internal server error' });
+            res.status(500).json({ success: false, message: 'Internal server error', error: error });
         });
 });
 
