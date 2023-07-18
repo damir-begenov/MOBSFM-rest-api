@@ -6,7 +6,8 @@ const Organization = require('../classes/organization.js');
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const {auth} = require("firebase-admin");
-var randtoken = require('rand-token') 
+var randtoken = require('rand-token')
+const {or} = require("sequelize");
 
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
@@ -141,11 +142,14 @@ router.post('/checkCountOrg', (req, res) => {
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         if (user) {
-
+            list_ids = []
             const org_id = await t.many('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']])
-            console.log(org_id)
+
+            for(id in org_id){
+                list_ids.add(id['organization_id'])
+            }
+            console.log(list_ids)
             const organization = await t.many('SELECT * FROM accounts_organization WHERE id in $1', [org_id['organization_id']]);
-            console.log(organization)
             if (organization) {
 
                 res.json({
