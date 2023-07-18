@@ -145,7 +145,7 @@ router.post('/checkCountOrg', (req, res) => {
 
             const organization = await t.many('SELECT * FROM accounts_organization WHERE id in (SELECT organization_id FROM accounts_employee WHERE client_user_id = $1)', [user['id']]);
             if (organization) {
-
+            console.log(organization)
                 res.json({
                     success: true,
                     message: 'Checked for organizations',
