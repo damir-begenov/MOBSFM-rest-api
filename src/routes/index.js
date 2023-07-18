@@ -123,6 +123,37 @@ router.get('/news', (req,res) => {
 })
 
 
+router.post('/checkCountOrg', (req, res) => {
+    const {iin} = req.body;
+    db.task(async t => {
+        const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
+        if (user) {
+
+            const org_id = await t.many('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']])
+            console.log(org_id)
+            const organization = await t.many('SELECT * FROM accounts_organization WHERE id in $1', [org_id['organization_id']]);
+            console.log(organization)
+            if (organization) {
+
+                res.json({
+                    success: true,
+                    message: 'Checked for organizations',
+
+                });
+            } else {
+                // Organization not found
+                res.status(404).json({ success: false, message: 'Organization not found' });
+            }
+        } else {
+            // Invalid credentials
+            res.status(401).json({ success: false, message: 'Invalid iin' });
+        }
+    })
+        .catch(error => {
+            console.error('Error occurred while checking in:', error);
+            res.status(500).json({ success: false, message: 'Internal server error' });
+        });
+});
 
 
 router.post('/checkSession', (req, res) => {
