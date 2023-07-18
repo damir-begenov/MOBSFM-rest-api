@@ -150,6 +150,7 @@ router.post('/checkCountOrg', (req, res) => {
                     success: true,
                     message: 'Checked for organizations',
                     organization: organization,
+                    count: organization.length
                 });
             } else {
                 // Organization not found
