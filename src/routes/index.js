@@ -264,7 +264,7 @@ router.post('/checkSession', (req, res) => {
 var refreshTokens = {} 
 
 router.post('/login', (req, res) => {
-    const { iin, password } = req.body;
+    const { iin, password, org_id } = req.body;
     // Query the database to validate the user's credentials and fetch additional data
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
@@ -282,8 +282,7 @@ router.post('/login', (req, res) => {
         refreshTokens[refreshToken] = iin;
         user.refreshToken = refreshToken;
         if (user && user.id === password) {
-            const org_id = await t.oneOrNone('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']])
-            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id['organization_id']]);
+            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
             if (organization) {
                 const cfmCode = organization['subject_code_id'];
                 let docType = null;
