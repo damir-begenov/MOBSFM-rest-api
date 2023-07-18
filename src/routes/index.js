@@ -140,8 +140,8 @@ router.post('/checkSession', (req, res) => {
               );
               // save user token
               user.token = token;
-            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE iin = $1', [iin]);
-
+            const org_id = await t.oneOrNone('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']])
+            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id['organization_id']]);
             if (organization) {
                 const cfmCode = organization['subject_code_id'];
                 let docType = null;
@@ -163,10 +163,10 @@ router.post('/checkSession', (req, res) => {
                     user.docSeries = user_document['series']
                 }
 
-                const userId = user.user_id;
+                const userId = user['id'];
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE id = $1', [cfmCode]);
 
-                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE iin = $1', [iin]);
+                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE id = $1', [org_id['organization_id']]);
                 const userRole = await t.many('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
                 org_address = await t.oneOrNone('SELECT * FROM accounts_organizationaddres WHERE organization_id = $1', [organization['id']]);
                 if(org_address!=null){
@@ -237,9 +237,7 @@ router.post('/login', (req, res) => {
         user.refreshToken = refreshToken;
         if (user && user.id === password) {
             const org_id = await t.oneOrNone('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']])
-            console.log(org_id)
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id['organization_id']]);
-            console.log(organization)
             if (organization) {
                 const cfmCode = organization['subject_code_id'];
                 let docType = null;
