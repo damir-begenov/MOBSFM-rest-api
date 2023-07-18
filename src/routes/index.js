@@ -47,11 +47,10 @@ router.post('/regulatory_document', (req, res) => {
 });
 
 
-router.get('/assessment', (req, res) => {
-    // const {organization_id} = req.body;
+router.post('/assessment', (req, res) => {
+    const {organization_id} = req.body;
     db.task(async t => {
-        const assessment = await t.manyOrNone(`SELECT * FROM assessments_assessment where organization_id = $1 INNER JOIN assessnments_assessmentitem ON assessments_assessment.id = assessnments_assessmentitem.assessment_id `);
-
+        const assessment = await t.manyOrNone(`SELECT * FROM assessments_assessment where organization_id = $1 INNER JOIN assessnments_assessmentitem ON assessments_assessment.id = assessnments_assessmentitem.assessment_id `, [organization_id]);
         res.json({
             assessment: assessment,
         })
