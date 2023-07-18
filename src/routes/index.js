@@ -147,9 +147,9 @@ router.post('/checkCountOrg', (req, res) => {
 
             org_id.forEach(org => {
                 // Process each item here
-                console.log(org['organization_id']);
+                list_ids.push(org['organization_id']);
             });
-            const organization = await t.many('SELECT * FROM accounts_organization WHERE id in $1', [org_id['organization_id']]);
+            const organization = await t.many('SELECT * FROM accounts_organization WHERE id in $1', [list_ids]);
             if (organization) {
 
                 res.json({
