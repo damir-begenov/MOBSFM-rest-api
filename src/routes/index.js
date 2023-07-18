@@ -36,8 +36,10 @@ router.post('/certificate', (req, res) => {
 router.post('/regulatory_document', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
-        const regulatory_document_cur = await t.manyOrNone(`SELECT * FROM regulatory_document where organization_id = $1 and type_document = 'cur'`,[organization_id]);
-        const regulatory_document_pvk = await t.manyOrNone(`SELECT * FROM regulatory_document where organization_id = $1 and type_document = 'pvk'`,[organization_id]);
+        const regulatory_document_cur = await t.manyOrNone(`SELECT * FROM regulatory_document 
+        where organization_id = $1 and type_document = 'cur'`,[organization_id]);
+        const regulatory_document_pvk = await t.manyOrNone(`SELECT * FROM regulatory_document 
+        where organization_id = $1 and type_document = 'pvk'`,[organization_id]);
 
         res.json({
             regulatory_document_cur: regulatory_document_cur,
@@ -47,11 +49,12 @@ router.post('/regulatory_document', (req, res) => {
 });
 
 
-router.get('/assessment', (req, res) => {
-    // const {organization_id} = req.body;
+router.post('/assessment', (req, res) => {
+    const {organization_id} = req.body;
     db.task(async t => {
-        const assessment = await t.manyOrNone(`SELECT * FROM assessments_assesment`);
-
+        const assessment = await t.manyOrNone(`SELECT * FROM assessments_assessment 
+         INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
+         where assessments_assessment.organization_id = $1`, [organization_id]);
         res.json({
             assessment: assessment,
         })
