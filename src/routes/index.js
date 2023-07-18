@@ -267,7 +267,7 @@ router.post('/login', (req, res) => {
     const { iin, password, org_id } = req.body;
     // Query the database to validate the user's credentials and fetch additional data
     db.task(async t => {
-        print(org_id)
+        console.log(org_id)
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
         const token = jwt.sign(
             { user_id: user.iin, iin },
