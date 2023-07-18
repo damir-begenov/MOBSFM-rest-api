@@ -172,7 +172,7 @@ router.post('/checkCountOrg', (req, res) => {
 
 
 router.post('/checkSession', (req, res) => {
-    const {iin} = req.body;
+    const {iin, org_id} = req.body;
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         if (user) {
@@ -186,8 +186,7 @@ router.post('/checkSession', (req, res) => {
               );
               // save user token
               user.token = token;
-            const org_id = await t.oneOrNone('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']])
-            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id['organization_id']]);
+            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
             if (organization) {
                 const cfmCode = organization['subject_code_id'];
                 let docType = null;
@@ -212,7 +211,7 @@ router.post('/checkSession', (req, res) => {
                 const userId = user['id'];
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE id = $1', [cfmCode]);
 
-                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE id = $1', [org_id['organization_id']]);
+                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE id = $1', [org_id]);
                 const userRole = await t.many('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
                 org_address = await t.oneOrNone('SELECT * FROM accounts_organizationaddres WHERE organization_id = $1', [organization['id']]);
                 if(org_address!=null){
