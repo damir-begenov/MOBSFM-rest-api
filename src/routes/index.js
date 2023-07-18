@@ -46,6 +46,19 @@ router.post('/regulatory_document', (req, res) => {
 });
 
 
+router.get('/assessment', (req, res) => {
+    // const {organization_id} = req.body;
+    db.task(async t => {
+        const assessment = await t.manyOrNone(`SELECT * FROM assessments_assesment`);
+
+        res.json({
+            assessment: assessment,
+        })
+    });
+});
+
+
+
 router.get('/risk', (req, res) => {
     db.task(async t => {
         const risk = await t.manyOrNone('SELECT * FROM mutual_evaluation_mutualevaluationmaterialcategory');
