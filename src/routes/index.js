@@ -145,10 +145,10 @@ router.post('/checkCountOrg', (req, res) => {
             list_ids = []
             const org_id = await t.many('SELECT * FROM accounts_employee WHERE client_user_id = $1', [user['id']])
 
-            for(id in org_id){
+            for(ids in org_id){
                 list_ids.push(id['organization_id'])
+                console.log(ids)
             }
-            console.log(list_ids)
             const organization = await t.many('SELECT * FROM accounts_organization WHERE id in $1', [org_id['organization_id']]);
             if (organization) {
 
