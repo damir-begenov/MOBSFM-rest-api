@@ -267,7 +267,6 @@ router.post('/login', (req, res) => {
     const { iin, password, org_id } = req.body;
     // Query the database to validate the user's credentials and fetch additional data
     db.task(async t => {
-        console.log(org_id)
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
         const token = jwt.sign(
             { user_id: user.iin, iin },
@@ -308,7 +307,7 @@ router.post('/login', (req, res) => {
                 const userId = user['id'];
                 const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE id = $1', [cfmCode]);
 
-                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE id = $1', [org_id['organization_id']]);
+                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE id = $1', [org_id]);
                 const userRole = await t.many('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
                 org_address = await t.oneOrNone('SELECT * FROM accounts_organizationaddres WHERE organization_id = $1', [organization['id']]);
                 if(org_address!=null){
