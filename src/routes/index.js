@@ -53,7 +53,9 @@ router.post('/assessment', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
         const assessment = await t.manyOrNone(`SELECT * FROM assessments_assessment 
-         where assessments_assessment.organization_id = $1`, [organization_id]);
+         LEFT JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
+         where assessments_assessment.organization_id = $1 and assessments_assessment.date >= NOW()
+         AND assessments_assessment.date <= DATE_ADD(NOW(), INTERVAL 1 MONTH);`, [organization_id]);
         res.json({
             assessment: assessment,
             dafda: 'dsfds'
