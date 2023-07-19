@@ -140,7 +140,7 @@ router.post('/assessment', (req, res) => {
           GROUP BY assessments_assessmentitemcategory.code, a.color;`, [organization_id]);
           assessment_qualification_sum[0]['category_code'] = 'Квалификация';
           const all_points = await t.manyOrNone(`SELECT
-          SUM(assessments_assessmentitem.point) AS total_points, assessments_grade.color
+          SUM(assessments_assessmentitem.point) AS total_points
         FROM assessments_assessment
         INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id
         INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
