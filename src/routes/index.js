@@ -52,15 +52,62 @@ router.post('/regulatory_document', (req, res) => {
 router.post('/assessment', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
-        const assessment = await t.manyOrNone(`SELECT * FROM assessments_assessment 
+        const assessment_qualification = await t.manyOrNone(`SELECT * FROM assessments_assessment 
          INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
          INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
          INNER JOIN assessments_assessmentitemcategory ON assessments_assessmentitemcategory.id = assessments_assessmentitemcode.category_id
          WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
          AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
-         AND assessments_assessment.organization_id = $1;`, [organization_id]);
+         AND assessments_assessment.organization_id = $1 and assessments_assessmentitemcategory.code = 'qualification';`, [organization_id]);
+         assessment_qualification.cat_name = 'Квалификация';
+         const assessment_activity = await t.manyOrNone(`SELECT * FROM assessments_assessment 
+         INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
+         INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
+         INNER JOIN assessments_assessmentitemcategory ON assessments_assessmentitemcategory.id = assessments_assessmentitemcode.category_id
+         WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
+         AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
+         AND assessments_assessment.organization_id = $1 and assessments_assessmentitemcategory.code = 'activity';`, [organization_id]);
+         assessment_activity.cat_name = 'Активность';
+         const assessment_obedience = await t.manyOrNone(`SELECT * FROM assessments_assessment 
+         INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
+         INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
+         INNER JOIN assessments_assessmentitemcategory ON assessments_assessmentitemcategory.id = assessments_assessmentitemcode.category_id
+         WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
+         AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
+         AND assessments_assessment.organization_id = $1 and assessments_assessmentitemcategory.code = 'obedience';`, [organization_id]);
+         assessment_obedience.cat_name = 'Законопослушность';
+         const assessment_main_info = await t.manyOrNone(`SELECT * FROM assessments_assessment 
+         INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
+         INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
+         INNER JOIN assessments_assessmentitemcategory ON assessments_assessmentitemcategory.id = assessments_assessmentitemcode.category_id
+         WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
+         AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
+         AND assessments_assessment.organization_id = $1 and assessments_assessmentitemcategory.code = 'main_info';`, [organization_id]);
+         assessment_main_info.cat_name = 'Общие данные';
+         const assessment_regulator_documents = await t.manyOrNone(`SELECT * FROM assessments_assessment 
+         INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
+         INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
+         INNER JOIN assessments_assessmentitemcategory ON assessments_assessmentitemcategory.id = assessments_assessmentitemcode.category_id
+         WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
+         AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
+         AND assessments_assessment.organization_id = $1 and assessments_assessmentitemcategory.code = 'regulator_documents';`, [organization_id]);
+         assessment_regulator_documents.cat_name = 'Регламентирующие документы';
+         const assessment_fin = await t.manyOrNone(`SELECT * FROM assessments_assessment 
+         INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
+         INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
+         INNER JOIN assessments_assessmentitemcategory ON assessments_assessmentitemcategory.id = assessments_assessmentitemcode.category_id
+         WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
+         AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
+         AND assessments_assessment.organization_id = $1 and assessments_assessmentitemcategory.code = 'fin_monitoring_operations';`, [organization_id]);
+         assessment_fin.cat_name = 'Операции фин.мониторинга';
+
         res.json({
-            assessment: assessment,
+            assessment_qualification: assessment_qualification,
+            assessment_activity: assessment_activity,
+            assessment_obedience: assessment_obedience,
+            assessment_main_info: assessment_main_info,
+            assessment_regulator_documents: assessment_regulator_documents,
+            assessment_fin: assessment_fin,
         })
     });
 });
