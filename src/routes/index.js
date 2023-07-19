@@ -102,7 +102,6 @@ router.post('/assessment', (req, res) => {
          assessment_fin.cat_name = 'Операции фин.мониторинга';
          const assessment_activity_sum = await t.manyOrNone(`SELECT
             assessments_assessmentitemcategory.code AS category_code,
-            assessments_assessmentitemcategory.name AS category_name,
             SUM(assessments_assessmentitem.points) AS total_points
           FROM assessments_assessment
           INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id
@@ -112,7 +111,7 @@ router.post('/assessment', (req, res) => {
             AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
             AND assessments_assessment.organization_id = $1
             AND assessments_assessmentitemcategory.code = 'qualification'
-          GROUP BY assessments_assessmentitemcategory.code, assessments_assessmentitemcategory.name;`, [organization_id]);
+          GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
         res.json({
             assessment_qualification: assessment_qualification,
             assessment_activity: assessment_activity,
