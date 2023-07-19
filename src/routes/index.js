@@ -146,7 +146,6 @@ router.post('/assessment', (req, res) => {
         WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
           AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
           AND assessments_assessment.organization_id = $1;`, [organization_id]);
-          console.log(all_points);
           //   const all_points = assessment_qualification_sum[0]['total_points'] + assessment_fin[0]['total_points'] + assessment_regulator_documents[0]['total_points'] + assessment_main_info[0]['total_points'];
         res.json({
             assessments: assessments,
@@ -155,7 +154,8 @@ router.post('/assessment', (req, res) => {
             assessment_main_info_sum: assessment_main_info,
             assessment_regulator_documents_sum: assessment_regulator_documents,
             assessment_fin_sum: assessment_fin,
-            assessment_qualification_sum: assessment_qualification_sum
+            assessment_qualification_sum: assessment_qualification_sum,
+            total_points: all_points
         })
     });
 });
