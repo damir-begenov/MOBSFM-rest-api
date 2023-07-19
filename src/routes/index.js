@@ -113,6 +113,7 @@ router.post('/assessment', (req, res) => {
             AND assessments_assessmentitemcategory.code = 'qualification'
           GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
           const db = 'db'
+          console.log(assessment_activity_sum[0]);
           assessment_activity_sum.category_codelk = 'fsfes';
         res.json({
             assessment_qualification: assessment_qualification,
