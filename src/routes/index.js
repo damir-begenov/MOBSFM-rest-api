@@ -100,18 +100,18 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
          AND assessments_assessment.organization_id = $1 and assessments_assessmentitemcategory.code = 'fin_monitoring_operations';`, [organization_id]);
          assessment_fin.cat_name = 'Операции фин.мониторинга';
-        //  const assessment_activity_sum = await t.manyOrNone(`SELECT
-        //     assessments_assessmentitemcategory.code AS category_code,
-        //     SUM(assessments_assessmentitem.points) AS total_points
-        //   FROM assessments_assessment
-        //   INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id
-        //   INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
-        //   INNER JOIN assessments_assessmentitemcategory ON assessments_assessmentitemcategory.id = assessments_assessmentitemcode.category_id
-        //   WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
-        //     AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
-        //     AND assessments_assessment.organization_id = $1
-        //     AND assessments_assessmentitemcategory.code = 'qualification'
-        //   GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
+         const assessment_activity_sum = await t.manyOrNone(`SELECT
+            assessments_assessmentitemcategory.code AS category_code,
+            SUM(assessments_assessmentitem.point) AS total_points
+          FROM assessments_assessment
+          INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id
+          INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
+          INNER JOIN assessments_assessmentitemcategory ON assessments_assessmentitemcategory.id = assessments_assessmentitemcode.category_id
+          WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
+            AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
+            AND assessments_assessment.organization_id = $1
+            AND assessments_assessmentitemcategory.code = 'qualification'
+          GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
         res.json({
             assessment_qualification: assessment_qualification,
             assessment_activity: assessment_activity,
