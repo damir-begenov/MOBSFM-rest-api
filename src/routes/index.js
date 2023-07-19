@@ -119,7 +119,7 @@ router.post('/assessment', (req, res) => {
             assessment_main_info: assessment_main_info,
             assessment_regulator_documents: assessment_regulator_documents,
             assessment_fin: assessment_fin,
-            // assessment_activity_sum: assessment_activity_sum
+            assessment_activity_sum: assessment_activity_sum
         })
     });
 });
