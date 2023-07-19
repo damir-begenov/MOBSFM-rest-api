@@ -59,7 +59,6 @@ router.post('/assessment', (req, res) => {
          WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
          AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
          AND assessments_assessment.organization_id = $1;`, [organization_id]);
-         assessment_qualification.cat_name = 'Квалификация';
          const assessment_activity = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
          SUM(assessments_assessmentitem.point) AS total_points
