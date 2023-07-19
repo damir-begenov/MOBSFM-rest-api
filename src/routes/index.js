@@ -57,6 +57,7 @@ router.post('/assessment', (req, res) => {
          where assessments_assessment.organization_id = $1`, [organization_id]);
         res.json({
             assessment: assessment,
+            dafda: 'dsfds'
         })
     });
 });
