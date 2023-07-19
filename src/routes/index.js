@@ -52,8 +52,7 @@ router.post('/regulatory_document', (req, res) => {
 router.post('/assessment', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
-        const assessment = await t.manyOrNone(`SELECT count(*) FROM assessments_assessment 
-         LEFT JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
+        const assessment = await t.manyOrNone(`SELECT * FROM assessments_assessment 
          where assessments_assessment.organization_id = $1`, [organization_id]);
         res.json({
             assessment: assessment,
