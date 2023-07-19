@@ -54,7 +54,8 @@ router.post('/assessment', (req, res) => {
     db.task(async t => {
         const assessment = await t.manyOrNone(`SELECT * FROM assessments_assessment 
          INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
-         where assessments_assessment.organization_id = $1 `, [organization_id]);
+         where assessments_assessment.organization_id = $1 AND assessments_assessment.date >= NOW()
+         AND assessments_assessment.date <= DATE_ADD(NOW(), INTERVAL 1 MONTH)`, [organization_id]);
         res.json({
             assessment: assessment,
             dafda: 'dsfds'
