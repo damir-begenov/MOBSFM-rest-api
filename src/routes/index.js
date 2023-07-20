@@ -255,9 +255,22 @@ router.post('/riskListContent', (req, res) => {
     const {name} = req.body;
     db.task(async t => {
         const sanctions_sanctionother = await t.manyOrNone('SELECT * from sanctions_sanctionother a INNER JOIN sanctions_sanctionothercategory b ON a.category_id = b.id where b.name = $1', [name])
-        sanctions_sanctionother.document_count = await t.oneOrNone('SELECT COUNT(DISTINCT(status)) FROM sanctions_sanctionother a INNER JOIN sanctions_sanctionothercategory b ON a.category_id = b.id where b.name = $1',[name])
+
         res.json({
             sanctions_sanctionother: sanctions_sanctionother
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error', error: error});
+    });
+});
+
+router.post('/riskListFiles', (req, res) => {
+    const {name} = req.body;
+    db.task(async t => {
+        const sanctions_sanctionotherFiles = await t.manyOrNone('SELECT b.name, a.status from sanctions_sanctionother a INNER JOIN sanctions_sanctionothercategory b ON a.category_id = b.id where b.name = $1 group by b.name, a.status', [name])
+
+        res.json({
+            sanctions_sanctionotherFiles: sanctions_sanctionotherFiles
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error', error: error});
