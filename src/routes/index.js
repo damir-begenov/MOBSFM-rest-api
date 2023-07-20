@@ -146,6 +146,15 @@ router.post('/assessment', (req, res) => {
         WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
           AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
           AND assessments_assessment.organization_id = $1 ;`, [organization_id]);
+          const all_points_2 = await t.manyOrNone(`SELECT
+          SUM(assessments_assessmentitem.point) AS total_points
+        FROM assessments_assessment
+        INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id
+        INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
+        INNER JOIN assessments_assessmentitemcategory ON assessments_assessmentitemcategory.id = assessments_assessmentitemcode.category_id
+        WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 month' + INTERVAL '1 day'
+          AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '2 month' - INTERVAL '1 day')
+          AND assessments_assessment.organization_id = $1 ;`, [organization_id]);
           //   const all_points = assessment_qualification_sum[0]['total_points'] + assessment_fin[0]['total_points'] + assessment_regulator_documents[0]['total_points'] + assessment_main_info[0]['total_points'];
         res.json({
             assessments: assessments,
@@ -155,7 +164,8 @@ router.post('/assessment', (req, res) => {
             assessment_regulator_documents_sum: assessment_regulator_documents,
             assessment_fin_sum: assessment_fin,
             assessment_qualification_sum: assessment_qualification_sum,
-            total_points: all_points
+            total_points: all_points,
+            total_points_2 : all_points_2
         })
     });
 });
