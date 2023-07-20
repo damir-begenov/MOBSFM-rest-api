@@ -209,6 +209,18 @@ router.post('/getSentMessages', (req, res) => {
     });
 })
 
+router.post('/getReceivedMessages', (req, res) => {
+    const {organization_id} = req.body;
+    db.task(async t => {
+        const messReceived = await t.many('SELECT * FROM correspondence where id = (SELECT correspondence_id FROM correspondence_receiver where organization_id = $1)', [organization_id]);
+        res.json({
+            messReceived: messReceived,
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error', error: error });
+    });
+})
+
 router.get('/faq', (req, res) => {
     db.task(async t => {
         const faq_category = await t.manyOrNone('SELECT * FROM category_faq');
