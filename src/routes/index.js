@@ -254,7 +254,7 @@ router.get('/riskListCategory', (req, res) => {
 router.post('/riskListContent', (req, res) => {
     const {name} = req.body;
     db.task(async t => {
-        const sanctions_sanctionother = await t.manyOrNone('SELECT * from sanctions_sanctionother a INNER JOIN sanctions_sanctionothercategory b ON a.category_id = b.id where a.name = $1', [name])
+        const sanctions_sanctionother = await t.manyOrNone('SELECT * from sanctions_sanctionother a INNER JOIN sanctions_sanctionothercategory b ON a.category_id = b.id where b.name = $1', [name])
         res.json({
             sanctions_sanctionother: sanctions_sanctionother
         })
