@@ -52,7 +52,7 @@ router.post('/regulatory_document', (req, res) => {
 router.post('/assessment', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
-        const assessments = await t.manyOrNone(`SELECT * FROM assessments_assessment 
+        const        assessments = await t.manyOrNone(`SELECT * FROM assessments_assessment 
          INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
          INNER JOIN assessments_assessmentitemcode ON assessments_assessmentitemcode.id = assessments_assessmentitem.code_id
          INNER JOIN assessments_assessmentitemcategory ON assessments_assessmentitemcategory.id = assessments_assessmentitemcode.category_id
@@ -69,7 +69,7 @@ router.post('/assessment', (req, res) => {
        WHERE assessments_assessment.date >= date_trunc('month', current_date) + INTERVAL '1 day'
          AND assessments_assessment.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')
          AND assessments_assessment.organization_id = $1
-         AND assessments_assessmentitemcategory.code = 'activity'
+         AND assessments_assessmentitemcategory.code = 'activity' 
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
          assessment_activity[0]['category_code']  = 'Активность';
          const assessment_obedience = await t.manyOrNone(`SELECT
@@ -180,6 +180,17 @@ router.get('/fatf', (req, res) => {
         const fatf = await t.manyOrNone('SELECT * FROM fatfs_fatfcategory');
         res.json({
             fatf: fatf,
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    });
+})
+
+router.get('/getMessageCategories', (req, res) => {
+    db.task(async t => {
+        const messCategories = await t.many('SELECT * FROM correspondence_correspondencecategory');
+        res.json({
+            messCategories: messCategories,
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error' });
