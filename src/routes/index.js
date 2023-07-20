@@ -239,14 +239,11 @@ router.get('/news', (req,res) => {
 })
 
 
-router.get('/riskList', (req, res) => {
+router.get('/riskListCategory', (req, res) => {
     db.task(async t => {
         const sanctions_category = await t.manyOrNone('SELECT * FROM sanctions_sanctionothercategory');
-        const sanctions_sanctionother = await t.manyOrNone('SELECT * from sanctions_sanctionother a INNER JOIN sanctions_sanctionothercategory b ON a.category_id = b.id')
-
         res.json({
             sanctions_sanctionothercategory: sanctions_category,
-            sanctions_sanctionother: sanctions_sanctionother
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error', error: error});
