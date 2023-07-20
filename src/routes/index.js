@@ -249,7 +249,7 @@ router.get('/riskList', (req, res) => {
             sanctions_sanctionother: sanctions_sanctionother
         })
     }).catch(error => {
-        res.status(500).json({ success: false, message: 'Internal server error' });
+        res.status(500).json({ success: false, message: 'Internal server error', error: error});
     });
 });
 
