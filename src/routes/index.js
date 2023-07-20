@@ -193,7 +193,19 @@ router.get('/getMessageCategories', (req, res) => {
             messCategories: messCategories,
         })
     }).catch(error => {
-        res.status(500).json({ success: false, message: 'Internal server error' });
+        res.status(500).json({ success: false, message: 'Internal server error', error: error });
+    });
+})
+
+router.post('/getSentMessages', (req, res) => {
+    const {user_id} = req.body;
+    db.task(async t => {
+        const messSent = await t.many('SELECT * FROM correspondence where sender_user_id = $1', [user_id]);
+        res.json({
+            messSent: messSent,
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error', error: error });
     });
 })
 
