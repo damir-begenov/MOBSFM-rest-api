@@ -222,7 +222,7 @@ router.post('/getSentMessages', (req, res) => {
 router.post('/getReceivedMessages', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
-        const messReceived = await t.many('SELECT c.id as cor_id, c.created_at as cor_created_at, c.changed_at as cor_changed_at, c.subject as cor_subject, c.description as cor_description, c.files as cor_files,c.sender_organization_id as cor_sender_org_id, c.sender_user_id as cor_sender_user_id, c.category_id as cor_category_id, cr.organization_id as cor_receiver_org_id, n.seen as not_seen from correspondence c inner join correspondence_receiver cr on c.id = cr.correspondence_id inner join notification n on (SELECT organization_id from accounts_employee WHERE id = n.employee_id) = cr.organization_id where cr.organization_id = $1', [organization_id]);
+        const messReceived = await t.many('SELECT c.id as cor_id, c.created_at as cor_created_at, c.changed_at as cor_changed_at, c.subject as cor_subject, c.description as cor_description, c.files as cor_files,c.sender_organization_id as cor_sender_org_id, c.sender_user_id as cor_sender_user_id, c.category_id as cor_category_id, cr.organization_id as cor_receiver_org_id, n.seen as not_seen from correspondence c inner join correspondence_receiver cr on c.id = cr.correspondence_id inner join accounts_employee emp on emp.organization_id = $1 inner join notification n on c.id = n.correspondenceid and n.employee_id = emp.id  where cr.organization_id = $1', [organization_id]);
         res.json({
             messReceived: messReceived,
         })
