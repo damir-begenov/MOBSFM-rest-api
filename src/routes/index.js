@@ -222,7 +222,7 @@ router.post('/getSentMessages', (req, res) => {
 router.post('/getReceivedMessages', (req, res) => {
     const {organization_id} = req.body;
     db.task(async t => {
-        const messReceived = await t.many('SELECT * from correspondence c where c.id in (SELECT cr.correspondence_id FROM correspondence_receiver cr where cr.organization_id = $1)', [organization_id]);
+        const messReceived = await t.many('SELECT * from correspondence c inner join notification n on c.id = n.correspondence_id where c.id in (SELECT cr.correspondence_id FROM correspondence_receiver cr where cr.organization_id = $1)', [organization_id]);
         res.json({
             messReceived: messReceived,
         })
