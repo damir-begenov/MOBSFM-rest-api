@@ -301,7 +301,10 @@ router.post('/getQuestionnaires', (req,res) => {
 router.post('/getQuestions', (req,res) => {
     const {questionnaire_id} = req.body;
     db.task(async t => {
-        const questions = await t.manyOrNone(`SELECT * FROM questionnaire_question qq  where qq.questionnaire_id = $1`,[questionnaire_id]);
+        const questions = await t.many(`SELECT * FROM questionnaire_question qq  where qq.questionnaire_id = $1`,[questionnaire_id]);
+        for(let question in questions){
+            question.answers = await t.many(`SELECT * FROM questionnaire_answer qa  where qa.question_id = $1`,[question['id']]);
+        }
         res.json({
             questions: questions
         })
