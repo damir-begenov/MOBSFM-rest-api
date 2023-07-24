@@ -286,11 +286,12 @@ router.get('/news', (req,res) => {
 })
 
 
-router.get('/getQuiz', (req,res) => {
+router.post('/getQuestionnaires', (req,res) => {
+    const {category,subject_code} = req.body;
     db.task(async t => {
-        const quiz = await t.manyOrNone(`SELECT * FROM questionnaire_questionnaire where category = 'quiz'`);
+        const questionnaires = await t.manyOrNone(`SELECT * FROM questionnaire_questionnaire qq inner join questionnaire_questionnaire_subject_codes sc on qq.questionnaire_id = sc.questionnaire_id where qq.category = $1 and sc.codetype_id = $2`,[category, subject_code]);
         res.json({
-            quiz: quiz
+            questionnaires: questionnaires
         })
     }).catch(error =>{
         res.status(500).json({success: false});
