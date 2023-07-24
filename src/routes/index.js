@@ -298,18 +298,6 @@ router.post('/getQuestionnaires', (req,res) => {
     })
 })
 
-router.get('/getTests', (req,res) => {
-    db.task(async t => {
-        const tests = await t.manyOrNone(`SELECT * FROM questionnaire_questionnaire where category = 'testing'`);
-        res.json({
-            tests: tests
-        })
-    }).catch(error =>{
-        res.status(500).json({success: false});
-    })
-})
-
-
 router.get('/riskListCategory', (req, res) => {
     db.task(async t => {
         const sanctions_category = await t.manyOrNone('SELECT * FROM sanctions_sanctionothercategory');
