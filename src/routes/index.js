@@ -286,11 +286,22 @@ router.get('/news', (req,res) => {
 })
 
 
-router.get('/getQuestionnaires', (req,res) => {
+router.get('/getQuiz', (req,res) => {
     db.task(async t => {
-        const questionnaires = await t.manyOrNone('SELECT * FROM questionnaire_questionnaire');
+        const quiz = await t.manyOrNone(`SELECT * FROM questionnaire_questionnaire where category = 'quiz'`);
         res.json({
-            questionnaires: questionnaires
+            quiz: quiz
+        })
+    }).catch(error =>{
+        res.status(500).json({success: false});
+    })
+})
+
+router.get('/getTests', (req,res) => {
+    db.task(async t => {
+        const tests = await t.manyOrNone(`SELECT * FROM questionnaire_questionnaire where category = 'testing'`);
+        res.json({
+            tests: tests
         })
     }).catch(error =>{
         res.status(500).json({success: false});
