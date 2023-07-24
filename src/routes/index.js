@@ -258,6 +258,8 @@ router.get('/registry', (req, res) => {
 
 
 
+
+
 router.get('/education', (req, res) => {
     db.task(async t => {
         const education_category = await t.manyOrNone('SELECT * FROM education_category');
@@ -277,6 +279,18 @@ router.get('/news', (req,res) => {
         const news = await t.manyOrNone('SELECT * FROM news_news WHERE authorized = false');
         res.json({
             news: news
+        })
+    }).catch(error =>{
+        res.status(500).json({success: false});
+    })
+})
+
+
+router.get('/getQuestionnaires', (req,res) => {
+    db.task(async t => {
+        const questionnaires = await t.manyOrNone('SELECT * FROM questionnaire_questionnaire');
+        res.json({
+            questionnaires: questionnaires
         })
     }).catch(error =>{
         res.status(500).json({success: false});
