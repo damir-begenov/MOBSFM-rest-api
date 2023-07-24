@@ -298,6 +298,18 @@ router.post('/getQuestionnaires', (req,res) => {
     })
 })
 
+router.post('/getQuestions', (req,res) => {
+    const {questionnaire_id} = req.body;
+    db.task(async t => {
+        const questions = await t.manyOrNone(`SELECT * FROM questionnaire_question qq inner join questionnaire_answer qa on qq.id = qa.question_id  where qq.questionnaire_id = $1`,[questionnaire_id]);
+        res.json({
+            questions: questions
+        })
+    }).catch(error =>{
+        res.status(500).json({success: false, error: error});
+    })
+})
+
 router.get('/riskListCategory', (req, res) => {
     db.task(async t => {
         const sanctions_category = await t.manyOrNone('SELECT * FROM sanctions_sanctionothercategory');
