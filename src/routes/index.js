@@ -303,7 +303,7 @@ router.post('/getQuestions', (req, res) => {
     db.task(async t => {
         const questions = await t.many(`SELECT * FROM questionnaire_question qq WHERE qq.questionnaire_id = $1`, [questionnaire_id]);
         for (let question of questions) {
-            question.answers = await t.many(`SELECT * FROM questionnaire_answer qa WHERE qa.question_id = $1`, [question['id']]);
+            question.answers = await t.many(`SELECT * FROM questionnaire_answer qa WHERE qa.question_id = $1 order by qa.order`, [question['id']]);
         }
         res.json({
             questions: questions
