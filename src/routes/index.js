@@ -294,7 +294,7 @@ router.post('/getQuestionnaires', (req,res) => {
             questionnaires: questionnaires
         })
     }).catch(error =>{
-        res.status(500).json({success: false});
+        res.status(500).json({success: false, error: error});
     })
 })
 
