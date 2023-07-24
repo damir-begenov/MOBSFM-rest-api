@@ -289,7 +289,7 @@ router.get('/news', (req,res) => {
 router.post('/getQuestionnaires', (req,res) => {
     const {category,subject_code} = req.body;
     db.task(async t => {
-        const questionnaires = await t.manyOrNone(`SELECT * FROM questionnaire_questionnaire qq inner join questionnaire_questionnaire_subject_codes sc on qq.questionnaire_id = sc.questionnaire_id where qq.category = $1 and sc.codetype_id = $2`,[category, subject_code]);
+        const questionnaires = await t.manyOrNone(`SELECT * FROM questionnaire_questionnaire qq  where qq.category = $1 and qq.id in (SELECT questionnaire_id FROM questionnaire_questionnaire_subject_codes where codetype_id = $2)`,[category, subject_code]);
         res.json({
             questionnaires: questionnaires
         })
