@@ -298,6 +298,45 @@ router.post('/getQuestionnaires', (req,res) => {
     })
 })
 
+router.post('/postResults', async (req, res) => {
+    const { organization_id, questionnaire_id, testResults } = req.body;
+    const now = new Date();
+
+    try {
+        const questionnaireResultQuery = `
+      INSERT INTO questionnaire_result (created_at, changed_at, organization_id, questionnaire_id)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `;
+        const questionnaireResultValues = [now, now, organization_id, questionnaire_id];
+        const { id: questionnaire_result_id } = await db.one(questionnaireResultQuery, questionnaireResultValues);
+
+        const questionnaireAnswerValues = testResults.map((result) => [
+            now,
+            now,
+            result.answer_text,
+            result.answer_id,
+            result.question_id,
+            questionnaire_result_id,
+        ]);
+
+        const questionnaireAnswerQuery = `
+      INSERT INTO questionnaire_answer (created_at, changed_at, answer_text, answer_id, question_id, questionnaire_result_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `;
+        await db.tx(async (t) => {
+            // Using transaction to execute all insert queries as a single unit of work
+            const insertQueries = testResults.map((_, index) => t.none(questionnaireAnswerQuery, questionnaireAnswerValues[index]));
+            await t.batch(insertQueries);
+        });
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error inserting data:', error);
+        res.status(500).json({ success: false, error: 'Error inserting data' });
+    }
+});
+
 router.post('/getQuestions', (req, res) => {
     const { questionnaire_id } = req.body;
     db.task(async t => {
