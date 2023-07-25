@@ -301,17 +301,59 @@ router.post('/getQuestionnaires', (req,res) => {
 router.post('/getQuestions', (req, res) => {
     const { questionnaire_id } = req.body;
     db.task(async t => {
-        const questions = await t.many(`SELECT * FROM questionnaire_question qq WHERE qq.questionnaire_id = $1`, [questionnaire_id]);
-        for (let question of questions) {
-            question.answers = await t.many(`SELECT * FROM questionnaire_answer qa WHERE qa.question_id = $1 order by qa.order`, [question['id']]);
-        }
+        const questions = await t.many(`
+      SELECT qq.id, qq.created_at, qq.changed_at, qq.order, qq.text, qq.text_ru, qq.text_kk, qq.text_kaz, qq.questionnaire_id, 
+             qa.id as answer_id, qa.created_at as answer_created_at, qa.changed_at as answer_changed_at, qa.order as answer_order, qa.text as answer_text, qa.text_ru as answer_text_ru, qa.text_kk as answer_text_kk, qa.text_kaz as answer_text_kaz, qa.question_id as answer_question_id
+      FROM questionnaire_question qq 
+      LEFT JOIN questionnaire_answer qa ON qq.id = qa.question_id
+      WHERE qq.questionnaire_id = $1
+      ORDER BY qq.order, qa.order
+    `, [questionnaire_id]);
+
+        // Group answers by question
+        const groupedQuestions = {};
+        questions.forEach(question => {
+            const questionID = question.id;
+            if (!groupedQuestions[questionID]) {
+                groupedQuestions[questionID] = {
+                    id: questionID,
+                    created_at: question.created_at,
+                    changed_at: question.changed_at,
+                    order: question.order,
+                    text: question.text,
+                    text_ru: question.text_ru,
+                    text_kk: question.text_kk,
+                    text_kaz: question.text_kaz,
+                    questionnaire_id: question.questionnaire_id,
+                    answers: [],
+                };
+            }
+            if (question.answer_id) {
+                // Only add answer if it exists (not null)
+                groupedQuestions[questionID].answers.push({
+                    id: question.answer_id,
+                    created_at: question.answer_created_at,
+                    changed_at: question.answer_changed_at,
+                    order: question.answer_order,
+                    text: question.answer_text,
+                    text_ru: question.answer_text_ru,
+                    text_kk: question.answer_text_kk,
+                    text_kaz: question.answer_text_kaz,
+                    question_id: question.answer_question_id,
+                });
+            }
+        });
+
+        const finalQuestions = Object.values(groupedQuestions);
+
         res.json({
-            questions: questions
+            questions: finalQuestions,
         });
     }).catch(error => {
         res.status(500).json({ success: false, error: error });
     });
 });
+
 
 
 router.get('/riskListCategory', (req, res) => {
