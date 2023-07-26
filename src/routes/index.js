@@ -423,6 +423,51 @@ router.post('/riskListContent', (req, res) => {
     });
 });
 
+router.post('/section3Acategory', (req, res) => {
+    const {category} = req.body;
+    db.task(async t => {
+        const category_content = await t.many('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1', [category])
+
+        res.json({
+            category_content: category_content
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error', error: error});
+    });
+});
+
+router.post('/section3Bcategory', (req, res) => {
+    const {category} = req.body;
+
+    if(category === "category_1"){
+        db.task(async t => {
+            const category_content = await t.many(`SELECT * FROM sanctions_weaponsanction WHERE category = 'dprk' or category = 'iran'`);
+            const sanctionlog = await t.many(`SELECT * FROM sanctions_weaponsanctionlog`);
+            res.json({
+                category_content: category_content,
+                sanctionlog: sanctionlog
+            })
+        }).catch(error => {
+            res.status(500).json({ success: false, message: 'Internal server error', error: error});
+        });
+    }
+    else if(category === "category_2"){
+        db.task(async t => {
+            const category_content = await t.many(`SELECT * FROM sanctions_weaponsanction WHERE category = 'isil' or category = 'taliban'`);
+            const sanctionlog = await t.many(`SELECT * FROM sanctions_weaponsanctionlog`);
+            res.json({
+                category_content: category_content,
+                sanctionlog: sanctionlog
+            })
+        }).catch(error => {
+            res.status(500).json({ success: false, message: 'Internal server error', error: error});
+        });
+    }
+
+});
+
+
+
 router.post('/riskListFiles', (req, res) => {
     const {name} = req.body;
     db.task(async t => {
