@@ -306,7 +306,7 @@ router.post('/postResults', async (req, res) => {
 
     try {
         const questionnaireResultQuery = `
-      INSERT INTO questionnaire_result (created_at, changed_at, organization_id, questionnaire_id)
+      INSERT INTO questionnaire_questionnaireresult (created_at, changed_at, organization_id, questionnaire_id)
       VALUES ($1, $2, $3, $4)
       RETURNING id;
     `;
@@ -323,7 +323,7 @@ router.post('/postResults', async (req, res) => {
         ]);
 
         const questionnaireAnswerQuery = `
-      INSERT INTO questionnaire_answer (created_at, changed_at, answer_text, answer_id, question_id, questionnaire_result_id)
+      INSERT INTO questionnaire_organizationanswer (created_at, changed_at, answer_text, answer_id, question_id, questionnaire_result_id)
       VALUES ($1, $2, $3, $4, $5, $6)
     `;
         await db.tx(async (t) => {
