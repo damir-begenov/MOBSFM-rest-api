@@ -9,8 +9,8 @@ const {auth} = require("firebase-admin");
 var randtoken = require('rand-token')
 const {or} = require("sequelize");
 
-const { DB_USERNAME, DB_PASSWORD_TEST, DB_HOST_TEST, DB_PORT, DB_NAME_TEST } = process.env;
-const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD_TEST}@${DB_HOST_TEST}:${DB_PORT}/${DB_NAME_TEST}`;
+const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
+const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const db = pgp(connectionString);
 
 router.use(express.json());
@@ -71,7 +71,6 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'activity' 
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
-       try {
          assessment_activity[0]['category_code']  = 'Активность';
          const assessment_obedience = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
@@ -171,7 +170,6 @@ router.post('/assessment', (req, res) => {
             months.month
           ORDER BY
             months.month;`, [organization_id]);
-      
           //   const all_points = assessment_qualification_sum[0]['total_points'] + assessment_fin[0]['total_points'] + assessment_regulator_documents[0]['total_points'] + assessment_main_info[0]['total_points'];
         res.json({
             assessments: assessments,
@@ -184,10 +182,6 @@ router.post('/assessment', (req, res) => {
             total_points: all_points,
             total_points_2 : all_points_2
         }) 
-    } catch (err) {
-        // обработка ошибки
-      console.log(err);
-      }
     });
 });
 
