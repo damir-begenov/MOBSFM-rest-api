@@ -330,19 +330,21 @@ router.post('/getQuestionnaires', (req, res) => {
 
 router.post('/postResults', async (req, res) => {
     const { organization_id, questionnaire_id, testResults } = req.body;
-    console.log('Received testResults:', typeof  testResults);
     const now = new Date();
 
     try {
+        // Parse the testResults string into an array of objects
+        const parsedTestResults = JSON.parse(testResults);
+
         const questionnaireResultQuery = `
-            INSERT INTO questionnaire_questionnaireresult (created_at, changed_at, organization_id, questionnaire_id)
-            VALUES ($1, $2, $3, $4)
-            RETURNING id;
-        `;
+      INSERT INTO questionnaire_questionnaireresult (created_at, changed_at, organization_id, questionnaire_id)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `;
         const questionnaireResultValues = [now, now, organization_id, questionnaire_id];
         const { id: questionnaire_result_id } = await db.one(questionnaireResultQuery, questionnaireResultValues);
 
-        const questionnaireAnswerValues = testResults.map((result) => [
+        const questionnaireAnswerValues = parsedTestResults.map((result) => [
             now,
             now,
             result.answer_text || '', // Ensure answer_text is not null
@@ -352,9 +354,9 @@ router.post('/postResults', async (req, res) => {
         ]);
 
         const questionnaireAnswerQuery = `
-            INSERT INTO questionnaire_organizationanswer (created_at, changed_at, answer_text, answer_id, question_id, questionnaire_result_id)
-            VALUES ($1, $2, $3, $4, $5, $6)
-        `;
+      INSERT INTO questionnaire_organizationanswer (created_at, changed_at, answer_text, answer_id, question_id, questionnaire_result_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `;
 
         await db.tx(async (t) => {
             // Using transaction to execute all insert queries as a single unit of work
