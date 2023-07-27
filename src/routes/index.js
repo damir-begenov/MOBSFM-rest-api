@@ -310,6 +310,18 @@ router.get('/news', (req,res) => {
 })
 
 
+router.get('/getViolations', (req,res) => {
+    db.task(async t => {
+        const violations = await t.manyOrNone('SELECT * FROM rule_violation');
+        res.json({
+            violations: violations
+        })
+    }).catch(error =>{
+        res.status(500).json({success: false, error: error});
+    })
+})
+
+
 router.post('/getQuestionnaires', (req, res) => {
     const { category, subject_code, organization_id } = req.body;
 
