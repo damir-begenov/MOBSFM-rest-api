@@ -307,7 +307,7 @@ router.post('/getQuestionnaires', (req, res) => {
     db.task(async t => {
         const questionnaires = await t.many(`SELECT * FROM questionnaire_questionnaire qq  where qq.category = $1 and qq.id in (SELECT questionnaire_id FROM questionnaire_questionnaire_subject_codes where codetype_id = $2)`, [category, subject_code]);
 
-        const completed_questionnaires = await t.many(`SELECT questionnaire_id FROM questionnaire_questionnaireresult WHERE organization_id = $1`, [organization_id]);
+        const completed_questionnaires = await t.manyOrNone(`SELECT questionnaire_id FROM questionnaire_questionnaireresult WHERE organization_id = $1`, [organization_id]);
 
         res.json({
             questionnaires: questionnaires,
