@@ -199,7 +199,7 @@ router.post('/assessment', (req, res) => {
 router.post('/fm1_sfm', (req, res) => {
     const {iin} = req.body;
     db.task(async t => {
-        const fm1 = await t.manyOrNone(`SELECT * FROM fm1_sfm where iin = '$1'`, [iin]);
+        const fm1 = await t.manyOrNone(`SELECT * FROM fm1_sfm where iin = '020922550560'`, [iin]);
         res.json({
             fm1: fm1,
         })
