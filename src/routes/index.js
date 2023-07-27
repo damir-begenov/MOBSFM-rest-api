@@ -171,10 +171,7 @@ router.post('/assessment', (req, res) => {
             months.month
           ORDER BY
             months.month;`, [organization_id]);
-        } catch (err) {
-            // обработка ошибки
-          console.log(err);
-          }
+      
           //   const all_points = assessment_qualification_sum[0]['total_points'] + assessment_fin[0]['total_points'] + assessment_regulator_documents[0]['total_points'] + assessment_main_info[0]['total_points'];
         res.json({
             assessments: assessments,
@@ -187,6 +184,10 @@ router.post('/assessment', (req, res) => {
             total_points: all_points,
             total_points_2 : all_points_2
         }) 
+    } catch (err) {
+        // обработка ошибки
+      console.log(err);
+      }
     });
 });
 
