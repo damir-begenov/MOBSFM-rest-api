@@ -323,6 +323,16 @@ router.get('/news', (req,res) => {
     })
 })
 
+router.get('/getSubjectCodes', (req,res) => {
+    db.task(async t => {
+        const subject_codes = await t.manyOrNone('SELECT * FROM directories_codetype');
+        res.json({
+            subject_codes: subject_codes
+        })
+    }).catch(error =>{
+        res.status(500).json({success: false, error: error});
+    })
+})
 
 router.get('/getViolations', (req,res) => {
     db.task(async t => {
@@ -346,6 +356,8 @@ router.post('/section3Acategory', (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error', error: error});
     });
 });
+
+
 
 router.post('/section3Bcategory', (req, res) => {
     const {category} = req.body;
