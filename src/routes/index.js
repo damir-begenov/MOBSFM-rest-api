@@ -325,7 +325,7 @@ router.get('/news', (req,res) => {
 
 router.get('/getSubjectCodes', (req,res) => {
     db.task(async t => {
-        const subject_codes = await t.manyOrNone('SELECT * FROM directories_codetype');
+        const subject_codes = await t.manyOrNone('SELECT * FROM directories_codetype order by id');
         res.json({
             subject_codes: subject_codes
         })
