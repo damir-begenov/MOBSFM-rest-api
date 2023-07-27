@@ -9,8 +9,8 @@ const {auth} = require("firebase-admin");
 var randtoken = require('rand-token')
 const {or} = require("sequelize");
 
-const { DB_USERNAME, DB_PASSWORD_TEST, DB_HOST_TEST, DB_PORT, DB_NAME_TEST } = process.env;
-const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD_TEST}@${DB_HOST_TEST}:${DB_PORT}/${DB_NAME_TEST}`;
+const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
+const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const db = pgp(connectionString);
 
 router.use(express.json());
@@ -50,6 +50,7 @@ router.post('/regulatory_document', (req, res) => {
 
 
 router.post('/assessment', (req, res) => {
+    try {
     const {organization_id} = req.body;
     db.task(async t => {
         const        assessments = await t.manyOrNone(`SELECT * FROM assessments_assessment 
@@ -71,6 +72,7 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'activity' 
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
+         assessment_activity[0]['category_code']  = 'Активность';
          const assessment_obedience = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
          SUM(assessments_assessmentitem.point) AS total_points
@@ -83,6 +85,7 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'obedience'
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
+         assessment_obedience[0]['category_code']  = 'Законопослушность';
          const assessment_main_info = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
          SUM(assessments_assessmentitem.point) AS total_points
@@ -95,6 +98,7 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'main_info'
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
+         assessment_main_info[0]['category_code']  = 'Общие данные';
          const assessment_regulator_documents = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
          SUM(assessments_assessmentitem.point) AS total_points
@@ -107,6 +111,7 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'regulator_documents'
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
+         assessment_regulator_documents[0]['category_code']  = 'Регламентирующие документы';
          const assessment_fin = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
          SUM(assessments_assessmentitem.point) AS total_points
@@ -119,6 +124,7 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'fin_monitoring_operations'
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
+       assessment_fin[0]['category_code'] = 'Операции фин.мониторинга';
          const assessment_qualification_sum = await t.manyOrNone(`SELECT
             assessments_assessmentitemcategory.code AS category_code,
             SUM(assessments_assessmentitem.point) AS total_points
@@ -131,6 +137,7 @@ router.post('/assessment', (req, res) => {
             AND assessments_assessment.organization_id = $1
             AND assessments_assessmentitemcategory.code = 'qualification'
           GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
+          assessment_qualification_sum[0]['category_code'] = 'Квалификация';
           const all_points = await t.manyOrNone(`SELECT
           SUM(assessments_assessmentitem.point) AS total_points
         FROM assessments_assessment
@@ -176,7 +183,9 @@ router.post('/assessment', (req, res) => {
             total_points: all_points,
             total_points_2 : all_points_2
         }) 
-    });
+    });} catch (error) {
+        console.log(error);
+    }
 });
 
 
@@ -295,23 +304,19 @@ router.get('/news', (req,res) => {
 })
 
 
-router.post('/getQuestionnaires', (req, res) => {
-    const { category, subject_code, organization_id } = req.body;
-
+router.post('/getQuestionnaires', (req,res) => {
+    const {category,subject_code, organization_id} = req.body;
     db.task(async t => {
-        const questionnaires = await t.many(`SELECT * FROM questionnaire_questionnaire qq  where qq.category = $1 and qq.id in (SELECT questionnaire_id FROM questionnaire_questionnaire_subject_codes where codetype_id = $2)`, [category, subject_code]);
-
-        const completed_questionnaires = await t.manyOrNone(`SELECT questionnaire_id FROM questionnaire_questionnaireresult WHERE organization_id = $1`, [organization_id]);
-
+        const questionnaires = await t.many(`SELECT * FROM questionnaire_questionnaire qq  where qq.category = $1 and qq.id in (SELECT questionnaire_id FROM questionnaire_questionnaire_subject_codes where codetype_id = $2)`,[category, subject_code]);
+        const completed_questionnaires = await t.many(`SELECT questionnaire_id FROM questionnaire_questionnaireresult WHERE organization_id = $1`,[organization_id]);
         res.json({
             questionnaires: questionnaires,
             completed_questionnaires: completed_questionnaires
-        });
-    }).catch(error => {
-        res.status(500).json({ success: false, error: error });
-    });
-});
-
+        })
+    }).catch(error =>{
+        res.status(500).json({success: false, error: error});
+    })
+})
 
 router.post('/postResults', async (req, res) => {
     const { organization_id, questionnaire_id, testResults } = req.body;
@@ -435,51 +440,6 @@ router.post('/riskListContent', (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error', error: error});
     });
 });
-
-router.post('/section3Acategory', (req, res) => {
-    const {category} = req.body;
-    db.task(async t => {
-        const category_content = await t.many('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1', [category])
-
-        res.json({
-            category_content: category_content
-        })
-    }).catch(error => {
-        res.status(500).json({ success: false, message: 'Internal server error', error: error});
-    });
-});
-
-router.post('/section3Bcategory', (req, res) => {
-    const {category} = req.body;
-
-    if(category === "category_1"){
-        db.task(async t => {
-            const category_content = await t.many(`SELECT * FROM sanctions_weaponsanction WHERE category = 'dprk' or category = 'iran'`);
-            const sanctionlog = await t.many(`SELECT * FROM sanctions_weaponsanctionlog`);
-            res.json({
-                category_content: category_content,
-                sanctionlog: sanctionlog
-            })
-        }).catch(error => {
-            res.status(500).json({ success: false, message: 'Internal server error', error: error});
-        });
-    }
-    else if(category === "category_2"){
-        db.task(async t => {
-            const category_content = await t.many(`SELECT * FROM sanctions_weaponsanction WHERE category = 'isil' or category = 'taliban'`);
-            const sanctionlog = await t.many(`SELECT * FROM sanctions_weaponsanctionlog`);
-            res.json({
-                category_content: category_content,
-                sanctionlog: sanctionlog
-            })
-        }).catch(error => {
-            res.status(500).json({ success: false, message: 'Internal server error', error: error});
-        });
-    }
-
-});
-
-
 
 router.post('/riskListFiles', (req, res) => {
     const {name} = req.body;
