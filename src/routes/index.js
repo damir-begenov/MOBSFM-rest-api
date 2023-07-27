@@ -72,9 +72,8 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessmentitemcategory.code = 'activity' 
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
        console.log(assessment_activity);
-       if(assessment_activity != []) {
+       if(assessment_activity[0]['category_code'] != []) {
         assessment_activity[0]['category_code']  = 'Активность';
-
        }
          const assessment_obedience = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
