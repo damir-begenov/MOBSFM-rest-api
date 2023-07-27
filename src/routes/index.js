@@ -191,8 +191,22 @@ router.post('/assessment', (req, res) => {
             total_points: all_points,
             total_points_2 : all_points_2
         }) 
-    });
+    }).catch(err => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    })
 });
+
+router.post('/fm1_sfm', (req, res) => {
+    const {iin} = req.body;
+    db.task(async t => {
+        const fm1 = await t.manyOrNone(`SELECT * FROM fm1_sfm where iin = '$1'`, [iin]);
+        res.json({
+            fm1: fm1,
+        })
+    }).catch(err => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    })
+})
 
 
 
