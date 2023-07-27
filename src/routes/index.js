@@ -183,9 +183,9 @@ router.post('/assessment', (req, res) => {
             total_points: all_points,
             total_points_2 : all_points_2
         }) 
-    });} catch (error) {
+    })} catch (error) {
         console.log(error);
-    }
+    };
 });
 
 
