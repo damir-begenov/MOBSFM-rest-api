@@ -326,11 +326,6 @@ router.post('/postResults', async (req, res) => {
     const { organization_id, questionnaire_id, testResults } = req.body;
     const now = new Date();
 
-    if (!Array.isArray(testResults)) {
-        res.status(400).json({ success: false, error: 'testResults should be an array' });
-        return;
-    }
-
     try {
         const questionnaireResultQuery = `
             INSERT INTO questionnaire_questionnaireresult (created_at, changed_at, organization_id, questionnaire_id)
