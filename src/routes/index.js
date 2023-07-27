@@ -71,7 +71,6 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'activity' 
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
-         assessment_activity[0]['category_code']  = 'Активность';
          const assessment_obedience = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
          SUM(assessments_assessmentitem.point) AS total_points
@@ -84,7 +83,6 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'obedience'
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
-         assessment_obedience[0]['category_code']  = 'Законопослушность';
          const assessment_main_info = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
          SUM(assessments_assessmentitem.point) AS total_points
@@ -97,7 +95,6 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'main_info'
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
-         assessment_main_info[0]['category_code']  = 'Общие данные';
          const assessment_regulator_documents = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
          SUM(assessments_assessmentitem.point) AS total_points
@@ -110,7 +107,6 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'regulator_documents'
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
-         assessment_regulator_documents[0]['category_code']  = 'Регламентирующие документы';
          const assessment_fin = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
          SUM(assessments_assessmentitem.point) AS total_points
@@ -123,7 +119,6 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'fin_monitoring_operations'
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
-       assessment_fin[0]['category_code'] = 'Операции фин.мониторинга';
          const assessment_qualification_sum = await t.manyOrNone(`SELECT
             assessments_assessmentitemcategory.code AS category_code,
             SUM(assessments_assessmentitem.point) AS total_points
@@ -136,7 +131,6 @@ router.post('/assessment', (req, res) => {
             AND assessments_assessment.organization_id = $1
             AND assessments_assessmentitemcategory.code = 'qualification'
           GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
-          assessment_qualification_sum[0]['category_code'] = 'Квалификация';
           const all_points = await t.manyOrNone(`SELECT
           SUM(assessments_assessmentitem.point) AS total_points
         FROM assessments_assessment
