@@ -9,8 +9,8 @@ const {auth} = require("firebase-admin");
 var randtoken = require('rand-token')
 const {or} = require("sequelize");
 
-const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
-const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+const { DB_USERNAME, DB_PASSWORD_TEST, DB_HOST_TEST, DB_PORT, DB_NAME_TEST } = process.env;
+const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD_TEST}@${DB_HOST_TEST}:${DB_PORT}/${DB_NAME_TEST}`;
 const db = pgp(connectionString);
 
 router.use(express.json());
