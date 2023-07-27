@@ -71,7 +71,10 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'activity' 
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
-         assessment_activity[0]['category_code']  = 'Активность';
+       if(assessment_activity != null) {
+        assessment_activity[0]['category_code']  = 'Активность';
+
+       }
          const assessment_obedience = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
          SUM(assessments_assessmentitem.point) AS total_points
