@@ -71,7 +71,7 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'activity' 
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
-       console.log(assessment_activity);
+       console.log(assessment_activity[0]['category_code']);
        if(assessment_activity[0]['category_code'] != []) {
         assessment_activity[0]['category_code']  = 'Активность';
        }
