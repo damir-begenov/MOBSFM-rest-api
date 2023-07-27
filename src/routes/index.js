@@ -326,31 +326,37 @@ router.post('/postResults', async (req, res) => {
     const { organization_id, questionnaire_id, testResults } = req.body;
     const now = new Date();
 
+    if (!Array.isArray(testResults)) {
+        res.status(400).json({ success: false, error: 'testResults should be an array' });
+        return;
+    }
+
     try {
         const questionnaireResultQuery = `
-      INSERT INTO questionnaire_questionnaireresult (created_at, changed_at, organization_id, questionnaire_id)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id;
-    `;
+            INSERT INTO questionnaire_questionnaireresult (created_at, changed_at, organization_id, questionnaire_id)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id;
+        `;
         const questionnaireResultValues = [now, now, organization_id, questionnaire_id];
         const { id: questionnaire_result_id } = await db.one(questionnaireResultQuery, questionnaireResultValues);
 
         const questionnaireAnswerValues = testResults.map((result) => [
             now,
             now,
-            result.answer_text,
-            result.answer_id,
+            result.answer_text || '', // Ensure answer_text is not null
+            result.answer_id || null,
             result.question_id,
             questionnaire_result_id,
         ]);
 
         const questionnaireAnswerQuery = `
-      INSERT INTO questionnaire_organizationanswer (created_at, changed_at, answer_text, answer_id, question_id, questionnaire_result_id)
-      VALUES ($1, $2, $3, $4, $5, $6)
-    `;
+            INSERT INTO questionnaire_organizationanswer (created_at, changed_at, answer_text, answer_id, question_id, questionnaire_result_id)
+            VALUES ($1, $2, $3, $4, $5, $6)
+        `;
+
         await db.tx(async (t) => {
             // Using transaction to execute all insert queries as a single unit of work
-            const insertQueries = testResults.map((_, index) => t.none(questionnaireAnswerQuery, questionnaireAnswerValues[index]));
+            const insertQueries = questionnaireAnswerValues.map((values) => t.none(questionnaireAnswerQuery, values));
             await t.batch(insertQueries);
         });
 
