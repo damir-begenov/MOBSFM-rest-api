@@ -50,7 +50,6 @@ router.post('/regulatory_document', (req, res) => {
 
 
 router.post('/assessment', (req, res) => {
-    try {
     const {organization_id} = req.body;
     db.task(async t => {
         const        assessments = await t.manyOrNone(`SELECT * FROM assessments_assessment 
@@ -72,6 +71,7 @@ router.post('/assessment', (req, res) => {
          AND assessments_assessment.organization_id = $1
          AND assessments_assessmentitemcategory.code = 'activity' 
        GROUP BY assessments_assessmentitemcategory.code;`, [organization_id]);
+       try {
          assessment_activity[0]['category_code']  = 'Активность';
          const assessment_obedience = await t.manyOrNone(`SELECT
          assessments_assessmentitemcategory.code AS category_code,
@@ -171,6 +171,10 @@ router.post('/assessment', (req, res) => {
             months.month
           ORDER BY
             months.month;`, [organization_id]);
+        } catch (err) {
+            // обработка ошибки
+          console.log(err);
+          }
           //   const all_points = assessment_qualification_sum[0]['total_points'] + assessment_fin[0]['total_points'] + assessment_regulator_documents[0]['total_points'] + assessment_main_info[0]['total_points'];
         res.json({
             assessments: assessments,
@@ -183,9 +187,7 @@ router.post('/assessment', (req, res) => {
             total_points: all_points,
             total_points_2 : all_points_2
         }) 
-    })} catch (error) {
-        console.log(error);
-    };
+    });
 });
 
 
