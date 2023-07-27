@@ -324,7 +324,7 @@ router.post('/getQuestionnaires', (req, res) => {
 
 router.post('/postResults', async (req, res) => {
     const { organization_id, questionnaire_id, testResults } = req.body;
-    console.log('Received testResults:', testResults);
+    console.log('Received testResults:', typeof  testResults);
     const now = new Date();
 
     try {
