@@ -383,6 +383,7 @@ router.post('/getViolations', (req, res) => {
         where bin = $1`, [state_iin]);
         console.log(state_body)
         const controlled = state_body[0]['controlled_subject_codes'];
+        console.log(controlled)
         const code_types = [];
         for (var i = 0; i < controlled.length; i++) {
             const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
