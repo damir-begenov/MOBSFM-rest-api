@@ -233,8 +233,6 @@ router.post('/ohvat', (req,res) => {
             code_types: code_types,
             organization_ohvat_accepted: organization_ohvat_accepted
         })
-    }).catch(err => {
-        res.status(500).json({ success: false, message: 'Internal server error' });
     })
 })
 
