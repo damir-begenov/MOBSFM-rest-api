@@ -336,7 +336,7 @@ router.get('/getSubjectCodes', (req,res) => {
 
 router.get('/getViolations', (req,res) => {
     db.task(async t => {
-        const violations = await t.manyOrNone('SELECT * FROM rule_violation');
+        const violations = await t.manyOrNone('SELECT * FROM rule_violation rv inner join directories_codetype dc on rv.subject_code_id = dc.id');
         res.json({
             violations: violations
         })
