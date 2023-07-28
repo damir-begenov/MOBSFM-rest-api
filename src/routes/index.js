@@ -224,6 +224,7 @@ router.post('/ohvat', (req,res) => {
             code_types.push(codetype);
             const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
             where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
+            console.log(organization_ohvat[0]['count']);
             organization_ohvat_accepted.push(organization_ohvat);
           }
         res.json({
