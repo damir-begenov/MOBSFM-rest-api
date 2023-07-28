@@ -212,7 +212,7 @@ router.post('/ohvat', (req,res) => {
     const {bin} = req.body;
     db.task(async t => {
         const ohvat = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
-        where bin = '$1'`, [bin]);
+        where bin = $1`, [bin]);
         console.log(ohvat);
         res.json({
             ohvat: ohvat,
