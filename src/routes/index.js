@@ -213,7 +213,7 @@ router.post('/ohvat', (req,res) => {
     db.task(async t => {
         const ohvat = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
         where bin = $1`, [bin]);
-        const fff = ohvat[0][3];
+        const fff = ohvat[0]['name'];
         for(item in fff) {
             console.log(item);
         }
