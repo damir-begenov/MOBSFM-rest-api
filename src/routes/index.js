@@ -391,10 +391,10 @@ router.post('/getViolations', (req,res) => {
         }
         const codeTypeIds = code_types.map(codeType => codeType[0].id).join(',');
         console.log(codeTypeIds);
-        const violations = await t.manyOrNone('SELECT * FROM rule_violation rv inner join directories_codetype dc on rv.subject_code_id = dc.id');
+        const violations = await t.manyOrNone('SELECT * FROM rule_violation rv inner join directories_codetype dc on rv.subject_code_id = dc.id WHERE rv.subject_code_id IN (${codeTypeIds})');
         res.json({
             violations: violations,
-            regulated_codes: regulated_codes
+            regulated_codes: codeTypeIds
         })
     }).catch(error =>{
         res.status(500).json({success: false, error: error});
