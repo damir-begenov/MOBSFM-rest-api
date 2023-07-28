@@ -389,7 +389,8 @@ router.post('/getViolations', (req,res) => {
 
             code_types.push(codetype);
         }
-        console.log(code_types);
+        const codeTypeIds = code_types.map(codeType => codeType.id).join(',');
+        console.log(codeTypeIds);
         const violations = await t.manyOrNone('SELECT * FROM rule_violation rv inner join directories_codetype dc on rv.subject_code_id = dc.id');
         res.json({
             violations: violations,
