@@ -330,8 +330,11 @@ router.get('/getSubjectCodes', (req, res) => {
         // Extract the subject_code_id values from the distinct_subject_codes array
         const subject_code_ids = distinct_subject_codes.map((row) => row.subject_code_id);
 
-        // Use subject_code_ids array as a parameter in the next query
-        const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id = ANY($1)', [subject_code_ids]);
+        // Convert subject_code_ids array elements to integers
+        const subject_code_ids_int = subject_code_ids.map(Number);
+
+        // Use subject_code_ids_int array as a parameter in the next query
+        const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id = ANY($1)', [subject_code_ids_int]);
 
         res.json({
             subject_codes: subject_codes
@@ -340,6 +343,7 @@ router.get('/getSubjectCodes', (req, res) => {
         res.status(500).json({ success: false, error: error });
     });
 });
+
 
 
 router.get('/getViolations', (req,res) => {
