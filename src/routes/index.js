@@ -381,14 +381,12 @@ router.post('/getViolations', (req, res) => {
     db.task(async t => {
         const state_body = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
         where bin = $1`, [state_iin]);
-        console.log(state_body)
         const controlled = state_body[0]['controlled_subject_codes'];
-        console.log(controlled)
         const code_types = [];
         for (var i = 0; i < controlled.length; i++) {
             const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
             where code = $1`, [controlled[i]]);
-
+            console.log(code_type)
             code_types.push(codetype);
         }
         const codeTypeIds = code_types.map(codeType => parseInt(codeType[0].id)); // Convert elements to integers
