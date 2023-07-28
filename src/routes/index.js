@@ -325,7 +325,8 @@ router.get('/news', (req,res) => {
 
 router.get('/getSubjectCodes', (req,res) => {
     db.task(async t => {
-        const subject_codes = await t.manyOrNone('SELECT * FROM directories_codetype order by id');
+        const distinct_subject_codes = await t.manyOrNone('SELECT DISTINCT(subject_code_id) FROM rule_violation');
+        const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id in $1',[distinct_subject_codes])
         res.json({
             subject_codes: subject_codes
         })
