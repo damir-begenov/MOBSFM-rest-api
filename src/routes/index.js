@@ -215,14 +215,17 @@ router.post('/ohvat', (req,res) => {
         where bin = $1`, [bin]);
         const fff = ohvat[0]['controlled_subject_codes'];
         var length = fff.length;
+        const code_types = [];
         for (var i = 0; i < length; i++) {
             // Do something with 'item', which represents each element of the array
-            const ohvat = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
-            where bin = $1`, [fff[i]]);
+            const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
+            where code = $1`, [fff[i]]);
+            code_types.push(codetype);
             console.log(fff[i]);
           }
         res.json({
             ohvat: ohvat,
+            code_types: code_types
         })
     }).catch(err => {
         res.status(500).json({ success: false, message: 'Internal server error' });
