@@ -215,7 +215,7 @@ router.post('/ohvat', (req,res) => {
         where bin = $1`, [bin]);
         const fff = ohvat[0];
         for(item in fff) {
-            console.log(item['controlled_subject_codes']);
+            console.log(item);
         }
         console.log(fff);
         res.json({
