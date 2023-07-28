@@ -221,10 +221,10 @@ router.post('/ohvat', (req,res) => {
             // Do something with 'item', which represents each element of the array
             const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
             where code = $1`, [fff[i]]);
-            codetype.countall = organization_ohvat[0]['count'];
-            code_types.push(codetype);
             const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
             where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
+            codetype.countall = organization_ohvat[0]['count'];
+            code_types.push(codetype);
             console.log(organization_ohvat[0]['count']);
             organization_ohvat_accepted.push(organization_ohvat);
           }
