@@ -219,6 +219,7 @@ router.post('/ohvat', (req,res) => {
         const organization_ohvat_accepted = [];
         for (var i = 0; i < length; i++) {
             // Do something with 'item', which represents each element of the array
+            try {
             const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
             where code = $1`, [fff[i]]);
             const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
@@ -227,6 +228,17 @@ router.post('/ohvat', (req,res) => {
             codetype[0]['procents_of_org_names'] = (codetype[0]['count']*100)/parseFloat(organization_ohvat[0]['count']);
             code_types.push(codetype);
             organization_ohvat_accepted.push(organization_ohvat);
+            if (codetype.length === 0) {
+                // Handle the case when code is not found in directories_codetype table
+                // For example, you could skip it or log an error message.
+                console.log(`Code ${controlled[i]} not found in directories_codetype table.`);
+                continue;
+            }
+            code_types.push(codetype);
+        } catch (error) {
+            // Handle the error if the query fails for any reason
+            console.error(`Error while querying directories_codetype: ${error.message}`);
+        }
           }
         res.json({
             ohvat: ohvat,
