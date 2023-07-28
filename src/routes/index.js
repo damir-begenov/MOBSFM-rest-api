@@ -374,11 +374,14 @@ router.get('/getSubjectCodes', (req, res) => {
 
 
 
-router.get('/getViolations', (req,res) => {
+router.post('/getViolations', (req,res) => {
+    const {state_iin} = req.body;
     db.task(async t => {
+        const regulated_codes = await  t.manyOrNone('SELECT id FROM directories_codetype WHERE code in (SELECT controlled_subject_codes FROM directories_organizationcontrolledsubject WHERE bin = $1)',[state_iin] )
         const violations = await t.manyOrNone('SELECT * FROM rule_violation rv inner join directories_codetype dc on rv.subject_code_id = dc.id');
         res.json({
-            violations: violations
+            violations: violations,
+            regulated_codes: regulated_codes
         })
     }).catch(error =>{
         res.status(500).json({success: false, error: error});
