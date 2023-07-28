@@ -722,6 +722,7 @@ router.post('/checkSession', (req, res) => {
                 } else {
                     organization.subjectCode = null;
                 }
+
                 organization.orgType = orgType['type'];
                 organization.address = org_address;
 
