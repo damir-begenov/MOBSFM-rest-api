@@ -221,7 +221,7 @@ router.post('/ohvat', (req,res) => {
             const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
             where code = $1`, [fff[i]]);
             code_types.push(codetype);
-            console.log(codetype[0]);
+            console.log(codetype[0]['id']);
           }
         res.json({
             ohvat: ohvat,
