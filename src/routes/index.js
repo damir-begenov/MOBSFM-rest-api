@@ -323,17 +323,24 @@ router.get('/news', (req,res) => {
     })
 })
 
-router.get('/getSubjectCodes', (req,res) => {
-    db.task(async t => {
+router.get('/getSubjectCodes', (req, res) => {
+    db.task(async (t) => {
         const distinct_subject_codes = await t.manyOrNone('SELECT DISTINCT(subject_code_id) FROM rule_violation');
-        const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id in $1',[distinct_subject_codes])
+
+        // Extract the subject_code_id values from the distinct_subject_codes array
+        const subject_code_ids = distinct_subject_codes.map((row) => row.subject_code_id);
+
+        // Use subject_code_ids array as a parameter in the next query
+        const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id = ANY($1)', [subject_code_ids]);
+
         res.json({
             subject_codes: subject_codes
-        })
-    }).catch(error =>{
-        res.status(500).json({success: false, error: error});
-    })
-})
+        });
+    }).catch((error) => {
+        res.status(500).json({ success: false, error: error });
+    });
+});
+
 
 router.get('/getViolations', (req,res) => {
     db.task(async t => {
