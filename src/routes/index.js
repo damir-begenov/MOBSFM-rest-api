@@ -379,18 +379,28 @@ router.get('/getSubjectCodes', (req, res) => {
 router.post('/getViolations', (req, res) => {
     const { state_iin } = req.body;
     db.task(async t => {
-        const state_body = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
-        where bin = $1`, [state_iin]);
+        const state_body = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject
+                                               where bin = $1`, [state_iin]);
         const controlled = state_body[0]['controlled_subject_codes'];
         const code_types = [];
         for (var i = 0; i < controlled.length; i++) {
-            const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
-            where code = $1`, [controlled[i]]);
-            console.log(code_type)
-            code_types.push(codetype);
+            try {
+                const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
+                where code = $1`, [controlled[i]]);
+                if (codetype.length === 0) {
+                    // Handle the case when code is not found in directories_codetype table
+                    // For example, you could skip it or log an error message.
+                    console.log(`Code ${controlled[i]} not found in directories_codetype table.`);
+                    continue;
+                }
+                code_types.push(codetype);
+            } catch (error) {
+                // Handle the error if the query fails for any reason
+                console.error(`Error while querying directories_codetype: ${error.message}`);
+            }
         }
         const codeTypeIds = code_types.map(codeType => parseInt(codeType[0].id)); // Convert elements to integers
-        console.log(state_body)
+
         const violations = await t.manyOrNone('SELECT * FROM rule_violation rv inner join directories_codetype dc on rv.subject_code_id = dc.id WHERE rv.subject_code_id = ANY($1)', [codeTypeIds]);
 
         res.json({
