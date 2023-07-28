@@ -717,7 +717,13 @@ router.post('/checkSession', (req, res) => {
                 const persons = await t.many('SELECT * FROM accounts_employee a INNER JOIN accounts_clientuser b on a.client_user_id = b.id WHERE a.organization_id = $1',[organization['id']]);
 
                 organization.persons = persons;
-                organization.subjectCode = subjectCode['name'];
+                organization.subjectCode = subjectCode['name'] ?? null;
+                // Check if subjectCode is not null before accessing its properties
+                if (subjectCode !== null && typeof subjectCode === 'object') {
+                    organization.subjectCode = subjectCode['name'] ?? null;
+                } else {
+                    organization.subjectCode = null;
+                }
                 organization.orgType = orgType['type'];
                 organization.address = org_address;
 
