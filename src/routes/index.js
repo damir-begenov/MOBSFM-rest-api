@@ -214,6 +214,9 @@ router.post('/ohvat', (req,res) => {
         const ohvat = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
         where bin = $1`, [bin]);
         const fff = ohvat[0]['controlled_subject_codes'];
+        for(item in fff) {
+            console.log(item);
+        }
         console.log(fff);
         res.json({
             ohvat: ohvat,
