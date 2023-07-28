@@ -287,7 +287,7 @@ router.get('/getMessageCategories', (req, res) => {
     });
 })
 
-router.get('/getSentMessages', (req, res) => {
+router.post('/getSentMessages', (req, res) => {
     const {user_id} = req.body;
     db.task(async t => {
         const messSent = await t.many('SELECT * FROM correspondence where sender_user_id = $1', [user_id]);
