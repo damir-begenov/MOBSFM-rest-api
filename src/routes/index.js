@@ -10,7 +10,7 @@ var randtoken = require('rand-token')
 const {or} = require("sequelize");
 
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
-const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOSTT}:${DB_PORT}/${DB_NAME}`;
+const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const db = pgp(connectionString);
 
 router.use(express.json());
