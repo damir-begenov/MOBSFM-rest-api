@@ -390,7 +390,7 @@ router.post('/getViolations', (req, res) => {
             code_types.push(codetype);
         }
         const codeTypeIds = code_types.map(codeType => parseInt(codeType[0].id)); // Convert elements to integers
-
+        console.log(codeTypeIds)
         const violations = await t.manyOrNone('SELECT * FROM rule_violation rv inner join directories_codetype dc on rv.subject_code_id = dc.id WHERE rv.subject_code_id = ANY($1)', [codeTypeIds]);
 
         res.json({
