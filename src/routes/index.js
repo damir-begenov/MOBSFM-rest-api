@@ -208,7 +208,7 @@ router.post('/fm1_sfm', (req, res) => {
     })
 })
 
-router.post('/ohvat', (reg,res) => {
+router.post('/ohvat', (req,res) => {
     const {bin} = req.body;
     db.task(async t => {
         const ohvat = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
