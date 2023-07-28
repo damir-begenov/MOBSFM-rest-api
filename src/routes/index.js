@@ -376,8 +376,8 @@ router.get('/getSubjectCodes', (req, res) => {
 
 
 
-router.post('/getViolations', (req,res) => {
-    const {state_iin} = req.body;
+router.post('/getViolations', (req, res) => {
+    const { state_iin } = req.body;
     db.task(async t => {
         const state_body = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
         where bin = $1`, [state_iin]);
@@ -389,16 +389,19 @@ router.post('/getViolations', (req,res) => {
 
             code_types.push(codetype);
         }
-        const codeTypeIds = code_types.map(codeType => codeType[0].id).join(',');
+        const codeTypeIds = code_types.map(codeType => codeType[0].id);
+
         const violations = await t.manyOrNone('SELECT * FROM rule_violation rv inner join directories_codetype dc on rv.subject_code_id = dc.id WHERE rv.subject_code_id = ANY($1)', [codeTypeIds]);
+
         res.json({
             violations: violations,
             regulated_codes: codeTypeIds
-        })
-    }).catch(error =>{
-        res.status(500).json({success: false, error: error});
-    })
-})
+        });
+    }).catch(error => {
+        res.status(500).json({ success: false, error: error });
+    });
+});
+
 router.post('/section3Acategory', (req, res) => {
     const {category} = req.body;
     db.task(async t => {
