@@ -216,7 +216,7 @@ router.post('/ohvat', (req,res) => {
         const fff = ohvat[0]['controlled_subject_codes'];
         for (const item of fff) {
             // Do something with 'item', which represents each element of the array
-            console.log(item[0]);
+            console.log(fff[item]);
           }
         console.log(fff[0]);
         res.json({
