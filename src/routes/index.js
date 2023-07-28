@@ -216,16 +216,20 @@ router.post('/ohvat', (req,res) => {
         const fff = ohvat[0]['controlled_subject_codes'];
         var length = fff.length;
         const code_types = [];
+        const organization_ohvat_accepted = [];
         for (var i = 0; i < length; i++) {
             // Do something with 'item', which represents each element of the array
             const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
             where code = $1`, [fff[i]]);
             code_types.push(codetype);
-            console.log(codetype[0]['id']);
+            const organization_ohvat = await t.manyOrNone(`SELECT * FROM accounts_organization
+            where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
+            organization_ohvat_accepted.push(organization_ohvat);
           }
         res.json({
             ohvat: ohvat,
-            code_types: code_types
+            code_types: code_types,
+            organization_ohvat_accepted: organization_ohvat_accepted
         })
     }).catch(err => {
         res.status(500).json({ success: false, message: 'Internal server error' });
