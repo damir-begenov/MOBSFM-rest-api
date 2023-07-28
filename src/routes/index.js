@@ -223,6 +223,7 @@ router.post('/ohvat', (req,res) => {
             code_types.push(codetype);
             console.log(fff[i]);
           }
+        console.log(code_types[0]['id']);
         res.json({
             ohvat: ohvat,
             code_types: code_types
