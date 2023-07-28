@@ -208,6 +208,20 @@ router.post('/fm1_sfm', (req, res) => {
     })
 })
 
+router.post('/ohvat', (reg,res) => {
+    const {bin} = req.body;
+    db.task(async t => {
+        const ohvat = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
+        where bin = $1`, [bin]);
+        print(ohvat);
+        res.json({
+            ohvat: ohvat,
+        })
+    }).catch(err => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    })
+})
+
 
 
 router.get('/risk', (req, res) => {
