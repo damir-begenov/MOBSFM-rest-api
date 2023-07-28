@@ -376,34 +376,29 @@ router.get('/getSubjectCodes', (req, res) => {
 
 
 
-router.post('/getViolations', async (req, res) => {
-    const { state_iin } = req.body;
-    try {
-        const state_body = await db.oneOrNone(
-            'SELECT * FROM directories_organizationcontrolledsubject WHERE bin = $1',
-            [state_iin]
-        );
+router.post('/getViolations', (req,res) => {
+    const {state_iin} = req.body;
+    db.task(async t => {
+        const state_body = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
+        where bin = $1`, [state_iin]);
+        const controlled = state_body[0]['controlled_subject_codes'];
+        const code_types = [];
+        for (var i = 0; i < controlled.length; i++) {
+            const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
+            where code = $1`, [controlled[i]]);
 
-        if (!state_body || !state_body.controlled_subject_codes || state_body.controlled_subject_codes.length === 0) {
-            // Handle the case where no data is found or 'controlled_subject_codes' is empty
-            return res.json({ violations: [], regulated_codes: [] });
+            code_types.push(codetype);
         }
-
-        const controlled = state_body.controlled_subject_codes;
-        const codeTypeIds = controlled.map(code => code.id);
-        const violations = await db.manyOrNone(
-            'SELECT * FROM rule_violation rv INNER JOIN directories_codetype dc ON rv.subject_code_id = dc.id WHERE rv.subject_code_id IN ($1:csv)',
-            [codeTypeIds]
-        );
-
+        const codeTypeIds = code_types.map(codeType => codeType[0].id).join(',');
+        const violations = await t.manyOrNone('SELECT * FROM rule_violation rv inner join directories_codetype dc on rv.subject_code_id = dc.id WHERE rv.subject_code_id IN $1',[codeTypeIds]);
         res.json({
             violations: violations,
-            regulated_codes: codeTypeIds.join(',')
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error });
-    }
-});
+            regulated_codes: codeTypeIds
+        })
+    }).catch(error =>{
+        res.status(500).json({success: false, error: error});
+    })
+})
 router.post('/section3Acategory', (req, res) => {
     const {category} = req.body;
     db.task(async t => {
