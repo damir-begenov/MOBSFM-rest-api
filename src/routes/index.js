@@ -211,8 +211,8 @@ router.post('/fm1_sfm', (req, res) => {
 router.post('/ohvat', (req,res) => {
     const {bin} = req.body;
     db.task(async t => {
-        const ohvat = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject 
-        where bin = $1`, [bin]);
+        const ohvat = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject
+                                          where bin = $1`, [bin]);
         const fff = ohvat[0]['controlled_subject_codes'];
         var length = fff.length;
         const code_types = [];
@@ -220,26 +220,26 @@ router.post('/ohvat', (req,res) => {
         for (var i = 0; i < length; i++) {
             // Do something with 'item', which represents each element of the array
             try {
-            const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
-            where code = $1`, [fff[i]]);
-            const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
-            where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
-            codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
-            codetype[0]['procents_of_org_names'] = (codetype[0]['count']*100)/parseFloat(organization_ohvat[0]['count']);
-            code_types.push(codetype);
-            organization_ohvat_accepted.push(organization_ohvat);
-            if (codetype.length === 0) {
-                // Handle the case when code is not found in directories_codetype table
-                // For example, you could skip it or log an error message.
-                console.log(`Code ${controlled[i]} not found in directories_codetype table.`);
-                continue;
+                const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
+                                                     where code = $1`, [fff[i]]);
+                const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
+                                                               where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
+                codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
+                codetype[0]['procents_of_org_names'] = (codetype[0]['count']*100)/parseFloat(organization_ohvat[0]['count']);
+                code_types.push(codetype);
+                organization_ohvat_accepted.push(organization_ohvat);
+                if (codetype.length === 0) {
+                    // Handle the case when code is not found in directories_codetype table
+                    // For example, you could skip it or log an error message.
+                    console.log(`Code ${controlled[i]} not found in directories_codetype table.`);
+                    continue;
+                }
+                code_types.push(codetype);
+            } catch (error) {
+                // Handle the error if the query fails for any reason
+                console.error(`Error while querying directories_codetype: ${error.message}`);
             }
-            code_types.push(codetype);
-        } catch (error) {
-            // Handle the error if the query fails for any reason
-            console.error(`Error while querying directories_codetype: ${error.message}`);
         }
-          }
         res.json({
             ohvat: ohvat,
             code_types: code_types,
@@ -249,7 +249,6 @@ router.post('/ohvat', (req,res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     })
 })
-
 
 
 router.get('/risk', (req, res) => {
