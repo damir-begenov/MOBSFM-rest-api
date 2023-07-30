@@ -393,17 +393,21 @@ router.post('/getViolations', (req, res) => {
     db.task(async t => {
         const controlled = await t.manyOrNone(
             `SELECT codetype_id FROM accounts_organization_subject_codes
-       WHERE organization_id = $1`, [org_id]
+             WHERE organization_id = $1`,
+            [org_id]
         );
 
         // Extract the codetype_id values from the controlled array of objects
         const controlledCodes = controlled.map(item => item.codetype_id);
 
         const violations = await t.manyOrNone(
-            'SELECT rv.id as rv_id, rv.created_at as rv_created_at, rv.changed_at as rv_changed_at, rv.iin as rv_iin, rv.amount as rv_amount, rv.description as rv_description, rv.article as rv_article, rv.date as rv_date, dc.code as dc_code, dc.name as dc.name, ao.iin as ao_iin  FROM rule_violation rv LEFT JOIN accounts_organization ao on rv.state_body_id = ao.id LEFT JOIN directories_codetype dc ON rv.subject_code_id = dc.id WHERE rv.subject_code_id = ANY($1::int[])',
+            `SELECT rv.id as rv_id, rv.created_at as rv_created_at, rv.changed_at as rv_changed_at, rv.iin as rv_iin, rv.amount as rv_amount, rv.description as rv_description, rv.article as rv_article, rv.date as rv_date, dc.code as dc_code, dc.name as dc_name, ao.iin as ao_iin
+             FROM rule_violation rv
+             LEFT JOIN accounts_organization ao ON rv.state_body_id = ao.id
+             LEFT JOIN directories_codetype dc ON rv.subject_code_id = dc.id
+             WHERE rv.subject_code_id = ANY($1)`,
             [controlledCodes]
         );
-
 
         res.json({
             violations: violations,
@@ -413,6 +417,7 @@ router.post('/getViolations', (req, res) => {
         res.status(500).json({ success: false, error: error });
     });
 });
+
 
 
 router.post('/section3Acategory', (req, res) => {
