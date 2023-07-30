@@ -370,12 +370,14 @@ router.post('/getSubjectCodes', (req, res) => {
     db.task(async (t) => {
         const controlled = await t.manyOrNone(
             `SELECT codetype_id FROM accounts_organization_subject_codes
-             WHERE organization_id = $1`, [org_id]
+       WHERE organization_id = $1`, [org_id]
         );
-        const controlledCodes = controlled.map(item => item.codetype_id);
-        console.log(controlledCodes);
+
+        // Extract the codetype_id values from the controlled array of objects and convert them to integers
+        const controlledCodes = controlled.map(item => parseInt(item.codetype_id));
+
         const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
-        console.log(controlledCodes);
+
         res.json({
             subject_codes: subject_codes
         });
@@ -383,6 +385,7 @@ router.post('/getSubjectCodes', (req, res) => {
         res.status(500).json({ success: false, error: error });
     });
 });
+
 
 
 
