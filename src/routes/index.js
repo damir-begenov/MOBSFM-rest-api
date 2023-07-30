@@ -365,18 +365,15 @@ router.get('/news', (req,res) => {
     })
 })
 
-router.get('/getSubjectCodes', (req, res) => {
+router.post('/getSubjectCodes', (req, res) => {
+    const { org_id } = req.body;
     db.task(async (t) => {
-        const distinct_subject_codes = await t.manyOrNone('SELECT DISTINCT(subject_code_id) FROM rule_violation');
-
-        // Extract the subject_code_id values from the distinct_subject_codes array
-        const subject_code_ids = distinct_subject_codes.map((row) => row.subject_code_id);
-
-        // Convert subject_code_ids array elements to integers
-        const subject_code_ids_int = subject_code_ids.map(Number);
-
-        // Use subject_code_ids_int array as a parameter in the next query
-        const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id = ANY($1)', [subject_code_ids_int]);
+        const controlled = await t.manyOrNone(
+            `SELECT codetype_id FROM accounts_organization_subject_codes
+             WHERE organization_id = $1`, [org_id]
+        );
+        const controlledCodes = controlled.map(item => item.codetype_id);
+        const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
 
         res.json({
             subject_codes: subject_codes
