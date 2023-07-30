@@ -391,16 +391,22 @@ router.get('/getSubjectCodes', (req, res) => {
 router.post('/getViolations', (req, res) => {
     const { org_id } = req.body;
     db.task(async t => {
+        const controlled = await t.manyOrNone(
+            `SELECT codetype_id FROM accounts_organization_subject_codes
+       WHERE organization_id = $1`, [org_id]
+        );
 
-        const controlled = await t.manyOrNone(`SELECT codetype_id FROM accounts_organization_subject_codes
-                                               where organization_id = $1`, [org_id]);
+        // Extract the codetype_id values from the controlled array of objects
+        const controlledCodes = controlled.map(item => item.codetype_id);
 
-        console.log(controlled);
-        const violations = await t.manyOrNone('SELECT * FROM rule_violation rv inner join directories_codetype dc on rv.subject_code_id = dc.id WHERE rv.subject_code_id = ANY($1)', [controlled]);
+        const violations = await t.manyOrNone(
+            'SELECT * FROM rule_violation rv INNER JOIN directories_codetype dc ON rv.subject_code_id = dc.id WHERE rv.subject_code_id = ANY($1::int[])',
+            [controlledCodes]
+        );
 
         res.json({
             violations: violations,
-            regulated_codes: controlled
+            regulated_codes: controlledCodes // Send the array of controlled codes to the client
         });
     }).catch(error => {
         res.status(500).json({ success: false, error: error });
