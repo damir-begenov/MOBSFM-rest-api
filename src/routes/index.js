@@ -373,6 +373,7 @@ router.post('/getSubjectCodes', (req, res) => {
              WHERE organization_id = $1`, [org_id]
         );
         const controlledCodes = controlled.map(item => item.codetype_id);
+        console.log(controlledCodes);
         const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
         console.log(controlledCodes);
         res.json({
