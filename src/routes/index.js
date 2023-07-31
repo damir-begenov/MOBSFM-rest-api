@@ -298,14 +298,18 @@ router.post('/getSentMessages', (req, res) => {
     });
 })
 
+const jwt = require('jsonwebtoken');
+
 function verifyToken(req, res, next) {
     const token = req.header('Authorization');
-    console.log(token)
-    if (!token) {
-        return res.status(401).json({ success: false, message: 'Access denied. Token not provided.' });
+    console.log(token);
+
+    if (!token || !token.startsWith('Bearer ')) {
+        return res.status(401).json({ success: false, message: 'Access denied. Token not provided or invalid format.' });
     }
 
-    jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
+    const tokenWithoutBearer = token.slice(7); // Remove the "Bearer " prefix
+    jwt.verify(tokenWithoutBearer, process.env.SECRET_KEY, (err, decodedToken) => {
         if (err) {
             return res.status(401).json({ success: false, message: 'Invalid or expired token.' });
         }
