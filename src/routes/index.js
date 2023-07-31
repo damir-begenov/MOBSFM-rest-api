@@ -766,7 +766,7 @@ router.post('/login', (req, res) => {
             { user_id: user.iin, iin },
             'chelovekpauk',
             {
-                expiresIn: "2h",
+                expiresIn: "1h",
             }
         );
 
@@ -830,9 +830,10 @@ router.post('/login', (req, res) => {
                 organization.address = org_address;
 
                 user.userRole = userRole[0]['role'];
-
-                console.log(user)
-                console.log(organization)
+                const currentTime = new Date();
+                console.log('User ' + user['first_name'] + ' ' + user['last_name'] + ' with id: '+ user['id']+ ' and iin: '+ user['iin'] + ' is logged in ' + 'at ' + currentTime.toISOString())
+                console.log('Organization id: ' + organization['id'] + ' Organization iin: ' + organization['iin'] + ' Organization name: ' + organization['full_name'])
+                console.log('Organization type: ' + organization['orgType'] + ' Subject code: ' + organization['subjectCode'])
                 // Authentication successful
                 res.json({
                     success: true,
