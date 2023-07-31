@@ -364,6 +364,17 @@ router.get('/news', (req,res) => {
     })
 })
 
+router.get('/getPdl', (req,res) => {
+    db.task(async t => {
+        const pdls = await t.manyOrNone('SELECT * FROM pdl_pdl');
+        res.json({
+            pdls: pdls
+        })
+    }).catch(error =>{
+        res.status(500).json({success: false,error: error});
+    })
+})
+
 router.post('/getSubjectCodes', (req, res) => {
     const { org_id } = req.body;
     db.task(async (t) => {
