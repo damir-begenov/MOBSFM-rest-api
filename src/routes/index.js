@@ -807,7 +807,6 @@ router.post('/login', (req, res) => {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
             if (organization) {
                 const secretKey = process.env.SECRET_KEY;
-                console.log(secretKey)
                 const token = jwt.sign(
                     {
                         "user_id": user.id,
@@ -823,7 +822,7 @@ router.post('/login', (req, res) => {
 
                 // save user token
                 user.token = token;
-
+                console.log(token)
                 const cfmCode = organization['subject_code_id'];
                 let docType = null;
                 let user_document = null;
