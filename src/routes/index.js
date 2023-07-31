@@ -298,12 +298,32 @@ router.post('/getSentMessages', (req, res) => {
     });
 })
 
-router.post('/getReceivedMessages', (req, res) => {
+function verifyToken(req, res, next) {
+    const token = req.header('Authorization');
+
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'Access denied. Token not provided.' });
+    }
+
+    jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
+        if (err) {
+            return res.status(401).json({ success: false, message: 'Invalid or expired token.' });
+        }
+
+        // Token is valid, decodedToken contains the payload data
+        req.user = decodedToken; // Store the user information in the request object for further use
+        next();
+    });
+}
+
+router.post('/getReceivedMessages', verifyToken,(req, res) => {
     const {organization_id} = req.body;
+    const user = req.user;
     db.task(async t => {
         const messReceived = await t.many('SELECT c.id as cor_id, c.created_at as cor_created_at, c.changed_at as cor_changed_at, c.subject as cor_subject, c.description as cor_description, c.files as cor_files,org.iin as cor_sender_org_iin, org.full_name as cor_sender_org_full_name, us.first_name as cor_sender_user_first_name, us.last_name as cor_sender_user_last_name, cat.name as cor_category_name, cr.organization_id as cor_receiver_org_id, n.seen as is_seen, n.employee_id as notification_employee_id from correspondence c inner join correspondence_receiver cr on c.id = cr.correspondence_id inner join accounts_employee emp on emp.organization_id = $1 inner join notification n on c.id = n.correspondence_id and n.employee_id = emp.id inner join accounts_organization org on c.sender_organization_id = org.id inner join accounts_clientuser us on c.sender_user_id = us.id inner join correspondence_correspondencecategory cat on c.category_id = cat.id where cr.organization_id = $1', [organization_id]);
         res.json({
             messReceived: messReceived,
+            user
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error', error: error });
@@ -791,22 +811,28 @@ router.post('/login', (req, res) => {
     // Query the database to validate the user's credentials and fetch additional data
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
-        const token = jwt.sign(
-            { user_id: user.iin, iin },
-            'chelovekpauk',
-            {
-                expiresIn: "1h",
-            }
-        );
 
-        // save user token
-        user.token = token;
-        var refreshToken = randtoken.uid(256) 
-        refreshTokens[refreshToken] = iin;
-        user.refreshToken = refreshToken;
+
         if (user && user.id === password) {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
             if (organization) {
+                const secretKey = process.env.SECRET_KEY;
+                const token = jwt.sign(
+                    {
+                        "user_id": user.id,
+                        "user_iin": user.iin,
+                        "org_id": organization.id,
+                        "org_iin": organization.iin
+                    },
+                    secretKey,
+                    {
+                        expiresIn: "1h",
+                    }
+                );
+
+                // save user token
+                user.token = token;
+
                 const cfmCode = organization['subject_code_id'];
                 let docType = null;
                 let user_document = null;
