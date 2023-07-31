@@ -829,12 +829,38 @@ router.post('/login', (req, res) => {
                 organization.orgType = orgType['type'];
                 organization.address = org_address;
 
+                const colors = {
+                    reset: "\x1b[0m",
+                    red: "\x1b[31m",
+                    green: "\x1b[32m",
+                    yellow: "\x1b[33m",
+                    blue: "\x1b[34m",
+                    magenta: "\x1b[35m",
+                    cyan: "\x1b[36m",
+                };
+
+                function coloredLog(color, message) {
+                    console.log(`${color}${message}${colors.reset}`);
+                }
+
                 user.userRole = userRole[0]['role'];
                 const currentTime = new Date();
-                console.log('User ' + user['first_name'] + ' ' + user['last_name'] + ' with id: '+ user['id']+ ' and iin: '+ user['iin'] + ' is logged in ' + 'at ' + currentTime.toISOString())
-                console.log('Organization id: ' + organization['id'] + ' Organization iin: ' + organization['iin'] + ' Organization name: ' + organization['full_name'])
-                console.log('Organization type: ' + organization['orgType'] + ' Subject code: ' + organization['subjectCode'])
+
+
+                coloredLog(colors.green,'User is logged in at: ' + currentTime.toISOString())
+                coloredLog(colors.cyan,'User id: ' + user['first_name'])
+                coloredLog(colors.cyan,'Users first name: ' + user['last_name'])
+                coloredLog(colors.cyan,'Users last name: ' + user['id'])
+                coloredLog(colors.cyan,'Users iin: ' + user['iin'])
                 // Authentication successful
+
+                coloredLog(colors.yellow, 'Organization information: ')
+                coloredLog(colors.cyan, 'Organization id: ' + organization['id'])
+                coloredLog(colors.cyan, 'Organization iin:: ' + organization['iin'])
+                coloredLog(colors.cyan, 'Organization name: ' + organization['full_name'])
+                coloredLog(colors.cyan, 'Organization type: ' + organization['orgType'])
+                coloredLog(colors.cyan, 'Subject code: ' + organization['subjectCode'])
+
                 res.json({
                     success: true,
                     message: 'Login successful',
