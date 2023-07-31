@@ -364,9 +364,10 @@ router.get('/news', (req,res) => {
     })
 })
 
-router.get('/getPdl', (req,res) => {
+router.post('/getPdl', (req,res) => {
+    const { iin } = req.body;
     db.task(async t => {
-        const pdls = await t.manyOrNone('SELECT * FROM pdl_pdl');
+        const pdls = await t.manyOrNone('SELECT * FROM pdl_pdl where iin = $1', [iin]);
         res.json({
             pdls: pdls
         })
