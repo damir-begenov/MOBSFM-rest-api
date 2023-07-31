@@ -747,22 +747,22 @@ router.post('/checkSession', (req, res) => {
 
                 coloredLog(colors.magenta, '---------------------------------------------')
                 coloredLog(colors.green,'User is logged in at: ' + currentTime.toISOString())
-                coloredLog(colors.green, '---------------------')
+                coloredLog(colors.green, ' ')
                 coloredLog(colors.cyan,'User id: ' + user['first_name'])
                 coloredLog(colors.cyan,'Users first name: ' + user['last_name'])
                 coloredLog(colors.cyan,'Users last name: ' + user['id'])
                 coloredLog(colors.cyan,'Users iin: ' + user['iin'])
-                coloredLog(colors.green, '---------------------')
+                coloredLog(colors.green, ' ')
                 // Authentication successful
 
                 coloredLog(colors.yellow, 'Organization information: ')
-                coloredLog(colors.yellow, '---------------------')
+                coloredLog(colors.yellow, ' ')
                 coloredLog(colors.cyan, 'Organization id: ' + organization['id'])
                 coloredLog(colors.cyan, 'Organization iin:: ' + organization['iin'])
                 coloredLog(colors.cyan, 'Organization name: ' + organization['full_name'])
                 coloredLog(colors.cyan, 'Organization type: ' + organization['orgType'])
                 coloredLog(colors.cyan, 'Subject code: ' + organization['subjectCode'])
-                coloredLog(colors.yellow, '---------------------')
+                coloredLog(colors.yellow, ' ')
                 // Authentication successful
                 res.json({
                     success: true,
