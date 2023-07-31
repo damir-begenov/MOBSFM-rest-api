@@ -300,7 +300,6 @@ router.post('/getSentMessages', (req, res) => {
 
 function verifyToken(req, res, next) {
     const token = req.header('Authorization');
-    console.log(token);
 
     if (!token || !token.startsWith('Bearer ')) {
         return res.status(401).json({ success: false, message: 'Access denied. Token not provided or invalid format.' });
@@ -312,7 +311,6 @@ function verifyToken(req, res, next) {
             return res.status(401).json({ success: false, message: 'Invalid or expired token.' });
         }
 
-        // Token is valid, decodedToken contains the payload data
         req.user = decodedToken; // Store the user information in the request object for further use
         next();
     });
