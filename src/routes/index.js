@@ -306,6 +306,9 @@ function verifyToken(req, res, next) {
     }
 
     jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
+        if (err) {
+            return res.status(401).json({ success: false, message: 'Invalid or expired token.' });
+        }
 
         // Token is valid, decodedToken contains the payload data
         req.user = decodedToken; // Store the user information in the request object for further use
@@ -683,16 +686,6 @@ router.post('/checkSession', (req, res) => {
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         if (user) {
-            const token = jwt.sign(
-                { user_id: user._id, iin },
-    
-                'chelovekpauk',
-                {
-                  expiresIn: "2h",
-                }
-              );
-              // save user token
-              user.token = token;
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
             if (organization) {
                 const cfmCode = organization['subject_code_id'];
@@ -814,6 +807,7 @@ router.post('/login', (req, res) => {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
             if (organization) {
                 const secretKey = process.env.SECRET_KEY;
+                console.log(secretKey)
                 const token = jwt.sign(
                     {
                         "user_id": user.id,
