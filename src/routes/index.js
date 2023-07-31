@@ -300,7 +300,7 @@ router.post('/getSentMessages', (req, res) => {
 
 function verifyToken(req, res, next) {
     const token = req.header('Authorization');
-
+    console.log(token)
     if (!token) {
         return res.status(401).json({ success: false, message: 'Access denied. Token not provided.' });
     }
