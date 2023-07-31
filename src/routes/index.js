@@ -306,9 +306,6 @@ function verifyToken(req, res, next) {
     }
 
     jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
-        if (err) {
-            return res.status(401).json({ success: false, message: 'Invalid or expired token.' });
-        }
 
         // Token is valid, decodedToken contains the payload data
         req.user = decodedToken; // Store the user information in the request object for further use
