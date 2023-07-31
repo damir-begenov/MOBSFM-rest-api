@@ -746,8 +746,7 @@ router.post('/checkSession', (req, res) => {
                 const currentTime = new Date();
 
                 coloredLog(colors.magenta, '---------------------------------------------')
-                coloredLog(colors.green,'User is logged in at: ' + currentTime.toISOString())
-                coloredLog(colors.green, '\n')
+                coloredLog(colors.green,'User is logged in at: ' + currentTime.toISOString() + '\n')
                 coloredLog(colors.cyan,'User id: ' + user['id'])
                 coloredLog(colors.cyan,'Users first name: ' + user['first_name'])
                 coloredLog(colors.cyan,'Users last name: ' + user['last_name'])
@@ -755,8 +754,7 @@ router.post('/checkSession', (req, res) => {
                 coloredLog(colors.green, ' ')
                 // Authentication successful
 
-                coloredLog(colors.yellow, 'Organization information: ')
-                coloredLog(colors.yellow, '\n')
+                coloredLog(colors.yellow, 'Organization information: ' + '\n')
                 coloredLog(colors.cyan, 'Organization id: ' + organization['id'])
                 coloredLog(colors.cyan, 'Organization iin:: ' + organization['iin'])
                 coloredLog(colors.cyan, 'Organization name: ' + organization['full_name'])
