@@ -730,8 +730,35 @@ router.post('/checkSession', (req, res) => {
 
                 user.userRole = userRole[0]['role'];
 
-                console.log(user)
-                console.log(organization)
+                const colors = {
+                    reset: "\x1b[0m",
+                    red: "\x1b[31m",
+                    green: "\x1b[32m",
+                    yellow: "\x1b[33m",
+                    blue: "\x1b[34m",
+                    magenta: "\x1b[35m",
+                    cyan: "\x1b[36m",
+                };
+
+                function coloredLog(color, message) {
+                    console.log(`${color}${message}${colors.reset}`);
+                }
+                const currentTime = new Date();
+
+                coloredLog(colors.magenta, '-------------------------------------------------')
+                coloredLog(colors.green,'User is logged in at: ' + currentTime.toISOString())
+                coloredLog(colors.cyan,'User id: ' + user['first_name'])
+                coloredLog(colors.cyan,'Users first name: ' + user['last_name'])
+                coloredLog(colors.cyan,'Users last name: ' + user['id'])
+                coloredLog(colors.cyan,'Users iin: ' + user['iin'])
+                // Authentication successful
+
+                coloredLog(colors.yellow, 'Organization information: ')
+                coloredLog(colors.cyan, 'Organization id: ' + organization['id'])
+                coloredLog(colors.cyan, 'Organization iin:: ' + organization['iin'])
+                coloredLog(colors.cyan, 'Organization name: ' + organization['full_name'])
+                coloredLog(colors.cyan, 'Organization type: ' + organization['orgType'])
+                coloredLog(colors.cyan, 'Subject code: ' + organization['subjectCode'])
                 // Authentication successful
                 res.json({
                     success: true,
@@ -846,7 +873,7 @@ router.post('/login', (req, res) => {
                 user.userRole = userRole[0]['role'];
                 const currentTime = new Date();
 
-
+                coloredLog(colors.magenta, '-------------------------------------------------')
                 coloredLog(colors.green,'User is logged in at: ' + currentTime.toISOString())
                 coloredLog(colors.cyan,'User id: ' + user['first_name'])
                 coloredLog(colors.cyan,'Users first name: ' + user['last_name'])
