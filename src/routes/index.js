@@ -286,12 +286,13 @@ router.get('/getMessageCategories', (req, res) => {
     });
 })
 
-router.post('/getSentMessages', (req, res) => {
-    const {user_id} = req.body;
+router.post('/getSentMessages', verifyToken, (req, res) => {
+    const {user_id, user} = req.body;
     db.task(async t => {
         const messSent = await t.many('SELECT * FROM correspondence where sender_user_id = $1', [user_id]);
         res.json({
             messSent: messSent,
+            user
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error', error: error });
