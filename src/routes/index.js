@@ -679,7 +679,7 @@ router.post('/checkCountOrg', (req, res) => {
             res.status(500).json({ success: false, message: 'Internal server error', error: error });
         });
 });
-router.post('/categoryCount', (req, res) => {
+router.post('/fmReview', (req, res) => {
         const {organization_id} = req.body
         db.task(async t => {
             const borderCount = await t.oneOrNone('select count(fm1statemachine_ptr_id) from fm1_fm1form fff left join directories_messagebasis dm on fff.message_basis_id = dm.id where organization_id = $1 and dm.category = $2', [organization_id, 'border']);
@@ -687,7 +687,10 @@ router.post('/categoryCount', (req, res) => {
             const typologyCount = await t.oneOrNone('select count(fm1statemachine_ptr_id) from fm1_fm1form fff left join directories_messagebasis dm on fff.message_basis_id = dm.id where organization_id = $1 and dm.category = $2', [organization_id, 'typology']);
             // Group answers by question
             const results = {
-                borderCount, riskCount, typologyCount
+                allCount: borderCount.count + riskCount.count + typologyCount.count,
+                borderCount: borderCount.count,
+                riskCount: riskCount.count,
+                typologyCount: typologyCount.count
             };
 
             res.json({
