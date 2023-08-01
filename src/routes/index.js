@@ -689,9 +689,9 @@ router.post('/fmReview', (req, res) => {
             // Group answers by question
             const results = {
                 allCount: parseInt(borderCount.count,10) + parseInt(riskCount.count,10) + parseInt(typologyCount.count,10),
-                borderCount: borderCount.count,
-                riskCount: riskCount.count,
-                typologyCount: typologyCount.count
+                borderCount: parseInt(borderCount.count, 10),
+                riskCount: parseInt(riskCount.count,10),
+                typologyCount: parseInt(typologyCount.count,10)
             };
 
             res.json({
