@@ -679,10 +679,27 @@ router.post('/checkCountOrg', (req, res) => {
             res.status(500).json({ success: false, message: 'Internal server error', error: error });
         });
 });
+router.post('/categoryCount', (req, res) => {
+        const {organization_id} = req.body
+        db.task(async t => {
+            const borderCount = await t.oneOrNone('select count(fm1statemachine_ptr_id) from fm1_fm1form fff left join directories_messagebasis dm on fff.message_basis_id = dm.id where organization_id = $1 and dm.category = $2', [organization_id, 'border']);
+            const riskCount = await t.oneOrNone('select count(fm1statemachine_ptr_id) from fm1_fm1form fff left join directories_messagebasis dm on fff.message_basis_id = dm.id where organization_id = $1 and dm.category = $2', [organization_id, 'risk']);
+            const typologyCount = await t.oneOrNone('select count(fm1statemachine_ptr_id) from fm1_fm1form fff left join directories_messagebasis dm on fff.message_basis_id = dm.id where organization_id = $1 and dm.category = $2', [organization_id, 'typology']);
+            // Group answers by question
+            const results = {
+                borderCount, riskCount, typologyCount
+            };
 
+            res.json({
+                results: results
+            });
+        }).catch(error => {
+            res.status(500).json({ success: false, error: error });
+        });
+    })
 
-router.post('/checkSession', (req, res) => {
-    const {iin, org_id} = req.body;
+router.post('/checkSession', verifyToken,(req, res) => {
+    const {iin, org_id, user} = req.body;
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         if (user) {
