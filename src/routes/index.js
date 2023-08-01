@@ -683,7 +683,7 @@ router.post('/fmReview', (req, res) => {
         const {organization_id} = req.body
         db.task(async t => {
             const borderCount = await t.oneOrNone('select count(fm1statemachine_ptr_id) from fm1_fm1form fff left join directories_messagebasis dm on fff.message_basis_id = dm.id where organization_id = $1 and dm.category = $2', [organization_id, 'border']);
-            const riskCount = await t.oneOrNone('select count(fm1statemachine_ptr_id) from fm1_fm1form fff left join directories_messagebasis dm on fff.message_basis_id = dm.id where organization_id = $1 and dm.category in $2', [organization_id, ['spo', 'pvk_measures']]);
+            const riskCount = await t.oneOrNone('select count(fm1statemachine_ptr_id) from fm1_fm1form fff left join directories_messagebasis dm on fff.message_basis_id = dm.id where organization_id = $1 and dm.category in $2', [organization_id, ['spo', 'pvk_measures'].join(',')]);
             const typologyCount = await t.oneOrNone('select count(fm1statemachine_ptr_id) from fm1_fm1form fff left join directories_messagebasis dm on fff.message_basis_id = dm.id where organization_id = $1 and dm.category = $2', [organization_id, 'typology']);
 
             // Group answers by question
