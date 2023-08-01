@@ -289,7 +289,7 @@ router.get('/getMessageCategories', (req, res) => {
 router.post('/getSentMessages', verifyToken, (req, res) => {
     const {user_id, user} = req.body;
     db.task(async t => {
-        const messSent = await t.many('SELECT * FROM correspondence where sender_user_id = $1', [user_id]);
+        const messSent = await t.many('SELECT c.id, c.created_at as cor_created_at, c.changed_at as cor_changed_at, c.subject as cor_subject, c.description as cor_description, org.iin as cor_sender_org_iin, org.fullname as cor_sender_org_full_name, us.first_name as cor_sender_user_first_name, us.last_name as cor_sender_user_last_name, cat.name as cor_category_name  FROM correspondence c inner join accounts_organization org on c.sender_organization_id = org.id inner join accounts_clientuser us on c.sender_user_id = us.id inner join correspondence_correspondencecategory cat on c.category_id = cat.id where sender_user_id = $1', [user_id]);
         res.json({
             messSent: messSent,
             user
