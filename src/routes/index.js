@@ -511,10 +511,10 @@ router.post('/getQuestionnaires', (req, res) => {
 });
 router.post('/postRuleViolation', verifyToken, async (req, res) => {
     const { data, user } = req.body;
-
+    const parseddata = JSON.parse(data);
     try {
-        console.log(req.body); // Log the entire data object sent from the Flutter application
-        res.json({ success: true, user, data });
+        console.log(parseddata); // Log the entire data object sent from the Flutter application
+        res.json({ success: true, user, parseddata });
     } catch (error) {
         console.error('Error inserting data:', error);
         res.status(500).json({ success: false, error: 'Error inserting data' });
