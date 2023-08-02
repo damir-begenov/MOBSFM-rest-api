@@ -509,9 +509,9 @@ router.post('/getQuestionnaires', (req, res) => {
         res.status(500).json({ success: false, error: error });
     });
 });
-router.post('/postRuleViolation', verifyToken, async (req, res) => {
-    const { bin, binOrg, selectedDropdownValue, date, sum, description, state, user } = req.body;
-
+router.post('/postRuleViolation', verifyToken, (req, res) => {
+    const { bin, binOrg, selectedDropdownValue, date, sum, description, state} = req.body;
+    const user = req.user;
     try {
         console.log(bin); // Log each individual field from the data object sent by Flutter
         console.log(binOrg);
@@ -524,7 +524,7 @@ router.post('/postRuleViolation', verifyToken, async (req, res) => {
         // Simulate an error to test error handling
         // throw new Error('Some error occurred');
 
-        res.json({ success: true });
+        res.json({ success: true, user });
     } catch (error) {
         console.error('Error inserting data:', error);
         res.status(500).json({ success: false, error: 'Error inserting data' });
