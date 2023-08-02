@@ -510,7 +510,7 @@ router.post('/getQuestionnaires', (req, res) => {
     });
 });
 router.post('/postRuleViolation', verifyToken, async (req, res) => {
-    const { bin, binOrg, selectedDropdownValue, date, sum, description, state, user } = req.body;
+    const { data, user } = req.body;
 
     try {
         console.log(req.body); // Log the entire data object sent from the Flutter application
