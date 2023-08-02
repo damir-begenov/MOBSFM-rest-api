@@ -277,7 +277,7 @@ router.get('/fatf', (req, res) => {
 
 router.get('/getMessageCategories', (req, res) => {
     db.task(async t => {
-        const messCategories = await t.many('SELECT * FROM correspondence_correspondencecategory');
+        const messCategories = await t.manyOrNone('SELECT * FROM correspondence_correspondencecategory');
         res.json({
             messCategories: messCategories,
         })
@@ -289,7 +289,7 @@ router.get('/getMessageCategories', (req, res) => {
 router.post('/getSentMessages', verifyToken, (req, res) => {
     const {user_id, user} = req.body;
     db.task(async t => {
-        const messSent = await t.many('SELECT c.id, c.created_at as cor_created_at, c.changed_at as cor_changed_at, c.subject as cor_subject, c.description as cor_description, org.iin as cor_sender_org_iin, org.full_name as cor_sender_org_full_name, us.first_name as cor_sender_user_first_name, us.last_name as cor_sender_user_last_name, cat.name as cor_category_name  FROM correspondence c inner join accounts_organization org on c.sender_organization_id = org.id inner join accounts_clientuser us on c.sender_user_id = us.id inner join correspondence_correspondencecategory cat on c.category_id = cat.id where sender_user_id = $1', [user_id]);
+        const messSent = await t.manyOrNone('SELECT c.id, c.created_at as cor_created_at, c.changed_at as cor_changed_at, c.subject as cor_subject, c.description as cor_description, org.iin as cor_sender_org_iin, org.full_name as cor_sender_org_full_name, us.first_name as cor_sender_user_first_name, us.last_name as cor_sender_user_last_name, cat.name as cor_category_name  FROM correspondence c inner join accounts_organization org on c.sender_organization_id = org.id inner join accounts_clientuser us on c.sender_user_id = us.id inner join correspondence_correspondencecategory cat on c.category_id = cat.id where sender_user_id = $1', [user_id]);
         res.json({
             messSent: messSent,
             user
@@ -321,7 +321,7 @@ router.post('/getReceivedMessages', verifyToken,(req, res) => {
     const {organization_id} = req.body;
     const user = req.user;
     db.task(async t => {
-        const messReceived = await t.many('SELECT c.id as cor_id, c.created_at as cor_created_at, c.changed_at as cor_changed_at, c.subject as cor_subject, c.description as cor_description, c.files as cor_files,org.iin as cor_sender_org_iin, org.full_name as cor_sender_org_full_name, us.first_name as cor_sender_user_first_name, us.last_name as cor_sender_user_last_name, cat.name as cor_category_name, cr.organization_id as cor_receiver_org_id, n.seen as is_seen, n.employee_id as notification_employee_id from correspondence c inner join correspondence_receiver cr on c.id = cr.correspondence_id inner join accounts_employee emp on emp.organization_id = $1 inner join notification n on c.id = n.correspondence_id and n.employee_id = emp.id inner join accounts_organization org on c.sender_organization_id = org.id inner join accounts_clientuser us on c.sender_user_id = us.id inner join correspondence_correspondencecategory cat on c.category_id = cat.id where cr.organization_id = $1', [organization_id]);
+        const messReceived = await t.manyOrNone('SELECT c.id as cor_id, c.created_at as cor_created_at, c.changed_at as cor_changed_at, c.subject as cor_subject, c.description as cor_description, c.files as cor_files,org.iin as cor_sender_org_iin, org.full_name as cor_sender_org_full_name, us.first_name as cor_sender_user_first_name, us.last_name as cor_sender_user_last_name, cat.name as cor_category_name, cr.organization_id as cor_receiver_org_id, n.seen as is_seen, n.employee_id as notification_employee_id from correspondence c inner join correspondence_receiver cr on c.id = cr.correspondence_id inner join accounts_employee emp on emp.organization_id = $1 inner join notification n on c.id = n.correspondence_id and n.employee_id = emp.id inner join accounts_organization org on c.sender_organization_id = org.id inner join accounts_clientuser us on c.sender_user_id = us.id inner join correspondence_correspondencecategory cat on c.category_id = cat.id where cr.organization_id = $1', [organization_id]);
         res.json({
             messReceived: messReceived,
             user
@@ -509,7 +509,17 @@ router.post('/getQuestionnaires', (req, res) => {
         res.status(500).json({ success: false, error: error });
     });
 });
+router.post('/postRuleViolation',verifyToken, async (req, res) => {
+    const { data,user } = req.body;
 
+    try {
+        console.log(data);
+        res.json({ success: true, user, data: data });
+    } catch (error) {
+        console.error('Error inserting data:', error);
+        res.status(500).json({ success: false, error: 'Error inserting data' });
+    }
+});
 
 router.post('/postResults', async (req, res) => {
     const { organization_id, questionnaire_id, testResults } = req.body;
