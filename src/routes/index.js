@@ -510,7 +510,7 @@ router.post('/getQuestionnaires', (req, res) => {
     });
 });
 router.post('/postRuleViolation', verifyToken, async (req, res) => {
-    const { bin, binOrg, selectedDropdownValue, date, sum, description, state } = req.body;
+    const { bin, binOrg, selectedDropdownValue, date, sum, description, state, user } = req.body;
 
     try {
         console.log(bin); // Log each individual field from the data object sent by Flutter
@@ -520,7 +520,7 @@ router.post('/postRuleViolation', verifyToken, async (req, res) => {
         console.log(sum);
         console.log(description);
         console.log(state);
-
+        console.log(user);
         // Simulate an error to test error handling
         // throw new Error('Some error occurred');
 
