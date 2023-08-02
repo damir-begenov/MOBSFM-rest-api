@@ -408,7 +408,7 @@ router.post('/getSubjectCodes', (req, res) => {
         // Extract the codetype_id values from the controlled array of objects and convert them to integers
         const controlledCodes = controlled.map(item => parseInt(item.codetype_id));
 
-        const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
+        const subject_codes = await t.manyOrNone('SELECT id,code,name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
 
         res.json({
             subject_codes: subject_codes
