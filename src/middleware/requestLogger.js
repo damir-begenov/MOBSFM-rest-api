@@ -11,7 +11,7 @@ function requestLogger(req, res, next) {
   `;
 
     // Change the file path to the desired location to store the logs
-    const logFilePath = '../logs/request_logs.txt';
+    const logFilePath = 'request_logs.txt';
 
     fs.appendFile(logFilePath, logMessage, (err) => {
         if (err) {
