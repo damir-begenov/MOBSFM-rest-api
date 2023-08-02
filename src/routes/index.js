@@ -510,20 +510,24 @@ router.post('/getQuestionnaires', (req, res) => {
     });
 });
 router.post('/postRuleViolation', verifyToken, (req, res) => {
-    const { bin, binOrg, selectedDropdownValue, date, sum, description, state} = req.body;
+    const { creatorOrgId, binOrgCreator, binOrgViolator, subject_code_id, date, amount, description, article} = req.body;
     const user = req.user;
     try {
-        console.log(bin); // Log each individual field from the data object sent by Flutter
-        console.log(binOrg);
-        console.log(selectedDropdownValue);
+        console.log(creatorOrgId);
+        console.log(binOrgCreator);
+        console.log(binOrgViolator);
+        console.log(subject_code_id);
         console.log(date);
-        console.log(sum);
+        console.log(amount);
         console.log(description);
-        console.log(state);
+        console.log(article);
         console.log(user);
-        // Simulate an error to test error handling
-        // throw new Error('Some error occurred');
 
+        const ruleViolationQuery = `
+        INSERT INTO rule_violation (created_at, changed_at, organization_id, questionnaire_id)
+        VALUES ($1, $2, $3, $4)
+        RETURNING id;
+        `;
         res.json({ success: true, user });
     } catch (error) {
         console.error('Error inserting data:', error);
