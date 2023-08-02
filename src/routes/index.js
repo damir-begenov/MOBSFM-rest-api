@@ -521,12 +521,16 @@ router.post('/postRuleViolation', verifyToken, async (req, res) => {
         console.log(description);
         console.log(state);
 
+        // Simulate an error to test error handling
+        // throw new Error('Some error occurred');
+
         res.json({ success: true });
     } catch (error) {
         console.error('Error inserting data:', error);
         res.status(500).json({ success: false, error: 'Error inserting data' });
     }
 });
+
 
 
 
