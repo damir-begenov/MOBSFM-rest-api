@@ -12,9 +12,11 @@ const {or} = require("sequelize");
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const db = pgp(connectionString);
+const requestLogger = require('../middleware/requestLogger.js');
 
+// Use the requestLogger middleware before your routes
 router.use(express.json());
-
+router.use(requestLogger);
 router.get('/api', (req, res) => {
     res.status(200).send({
         success: true,
