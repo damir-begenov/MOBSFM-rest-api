@@ -493,9 +493,9 @@ router.post('/section3Bcategory', (req, res) => {
 
 });
 
-router.post('/getQuestionnaires', (req, res) => {
+router.post('/getQuestionnaires', verifyToken,(req, res) => {
     const { category, subject_code, organization_id } = req.body;
-
+    const user = req.user;
     db.task(async t => {
         const questionnaires = await t.many(`SELECT * FROM questionnaire_questionnaire qq  where qq.category = $1 and qq.id in (SELECT questionnaire_id FROM questionnaire_questionnaire_subject_codes where codetype_id = $2)`, [category, subject_code]);
 
@@ -503,15 +503,17 @@ router.post('/getQuestionnaires', (req, res) => {
 
         res.json({
             questionnaires: questionnaires,
-            completed_questionnaires: completed_questionnaires
+            completed_questionnaires: completed_questionnaires,
+            user
         });
     }).catch(error => {
         res.status(500).json({ success: false, error: error });
     });
 });
-router.post('/postRuleViolation', verifyToken, (req, res) => {
-    const { creatorOrgId, binOrgCreator, binOrgViolator, subject_code_id, date, amount, description, article} = req.body;
+router.post('/postRuleViolation', verifyToken, async (req, res) => {
+    const {creatorOrgId, binOrgCreator, binOrgViolator, subject_code_id, date, amount, description, article} = req.body;
     const user = req.user;
+    const now = new Date();
     try {
         console.log(creatorOrgId);
         console.log(binOrgCreator);
@@ -524,14 +526,19 @@ router.post('/postRuleViolation', verifyToken, (req, res) => {
         console.log(user);
 
         const ruleViolationQuery = `
-        INSERT INTO rule_violation (created_at, changed_at, organization_id, questionnaire_id)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id;
+            INSERT INTO rule_violation (created_at, changed_at, iin, amount, description, article, state_body_id,
+                                        subject_code_id, date)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         `;
-        res.json({ success: true, user });
+        const ruleViolationValues = [now, now, binOrgViolator, amount, description, article, creatorOrgId, subject_code_id, date];
+
+        await db.one(ruleViolationQuery, ruleViolationValues);
+
+
+        res.json({success: true, user});
     } catch (error) {
         console.error('Error inserting data:', error);
-        res.status(500).json({ success: false, error: 'Error inserting data' });
+        res.status(500).json({success: false, error: 'Error inserting data'});
     }
 });
 
