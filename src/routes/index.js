@@ -37,8 +37,9 @@ router.post('/certificate', verifyToken,(req, res) => {
     });
 });
 
-router.post('/regulatory_document', (req, res) => {
+router.post('/regulatory_document', verifyToken,(req, res) => {
     const {organization_id} = req.body;
+    const user = req.user;
     db.task(async t => {
         const regulatory_document_cur = await t.manyOrNone(`SELECT * FROM regulatory_document 
         where organization_id = $1 and type_document = 'cur'`,[organization_id]);
@@ -47,7 +48,8 @@ router.post('/regulatory_document', (req, res) => {
 
         res.json({
             regulatory_document_cur: regulatory_document_cur,
-            regulatory_document_pvk: regulatory_document_pvk
+            regulatory_document_pvk: regulatory_document_pvk,
+            user
         })
     });
 });
