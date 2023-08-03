@@ -391,12 +391,14 @@ router.get('/news', (req,res) => {
     })
 })
 
-router.post('/getPdl', (req,res) => {
+router.post('/getPdl', verifyToken, (req,res) => {
     const { iin } = req.body;
+    const user = req.user;
     db.task(async t => {
         const pdls = await t.manyOrNone('SELECT * FROM pdl_pdl where iin = $1', [iin]);
         res.json({
-            pdls: pdls
+            pdls: pdls,
+            user
         })
     }).catch(error =>{
         res.status(500).json({success: false,error: error});
