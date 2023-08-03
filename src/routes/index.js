@@ -405,8 +405,9 @@ router.post('/getPdl', verifyToken, (req,res) => {
     })
 })
 
-router.post('/getSubjectCodes', (req, res) => {
+router.post('/getSubjectCodes', verifyToken, (req, res) => {
     const { org_id } = req.body;
+    const user = req.user;
     db.task(async (t) => {
         const controlled = await t.manyOrNone(
             `SELECT codetype_id FROM accounts_organization_subject_codes
@@ -419,7 +420,8 @@ router.post('/getSubjectCodes', (req, res) => {
         const subject_codes = await t.manyOrNone('SELECT id,code,name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
 
         res.json({
-            subject_codes: subject_codes
+            subject_codes: subject_codes,
+            user
         });
     }).catch((error) => {
         res.status(500).json({ success: false, error: error });
