@@ -58,7 +58,7 @@ router.post('/ocenkaBVU', (req, res) => {
     const {organization_id} = req.body
     db.task(async t => {
         const idshka = await t.oneOrNone(`SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
-        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1';`, [organization_id]);
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1;`, [organization_id]);
         const results = {
             idshka: idshka,
         };
