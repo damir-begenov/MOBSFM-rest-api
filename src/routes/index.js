@@ -795,7 +795,7 @@ router.post('/checkSession', verifyToken,(req, res) => {
                 }
 
                 organization.orgType = orgType['type'];
-
+                organization.regulated_codes = [];
                 if(organization.orgType === 'state_body'){
                     const controlled = await t.manyOrNone(
                         `SELECT codetype_id FROM accounts_organization_subject_codes
