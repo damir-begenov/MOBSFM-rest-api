@@ -59,8 +59,24 @@ router.post('/ocenkaBVU', (req, res) => {
     db.task(async t => {
         const idshka = await t.oneOrNone(`SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1;`, [organization_id]);
+        const first = await t.oneOrNone(`select sum(point)/count(*) from public.assessments_bankinteractionlevel ab where assessment_id in
+         (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
+         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1;`, [organization_id]);
+        const second = await t.oneOrNone(`select sum(point)/count(*) from public.assessments_suspensionquality ab where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1;`, [organization_id]);
+        const third = await t.oneOrNone(`select sum(point)/count(*) from public.assessments_sentmessagescorrectness where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')  and organization_id = $1;`, [organization_id]);
+        const fourth = await t.oneOrNone(`select sum(point)/count(*) from public.assessments_cashingoutbankinvolvement where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')  and organization_id = $1;`, [organization_id]);
+        const fifth = await t.oneOrNone(`select sum(point)/count(*) from public.assessments_internalrulesapplication where assessment_id in (SELECT id FROM public.assessments_bankassessment  ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1;`, [organization_id]);
         const results = {
             idshka: idshka,
+            first: first,
+            second: second,
+            third: third,
+            fourth: fourth,
+            fifth: fifth,
         };
         res.json({
             results: results
