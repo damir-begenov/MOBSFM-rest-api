@@ -65,9 +65,7 @@ router.post('/ocenkaBVU', (req, res) => {
         res.json({
             results: results
         });
-    }).catch(error => {
-        res.status(500).json({ success: false, error: error });
-    });
+    })
 })
 
 router.post('/assessment', (req, res) => {
