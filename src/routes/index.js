@@ -431,8 +431,9 @@ router.post('/getSubjectCodes', verifyToken, (req, res) => {
 
 
 
-router.post('/getViolations', (req, res) => {
+router.post('/getViolations', verifyToken, (req, res) => {
     const { org_id } = req.body;
+    const user = req.user;
     db.task(async t => {
         const controlled = await t.manyOrNone(
             `SELECT codetype_id FROM accounts_organization_subject_codes
@@ -450,7 +451,8 @@ router.post('/getViolations', (req, res) => {
 
         res.json({
             violations: violations,
-            regulated_codes: controlledCodes // Send the array of controlled codes to the client
+            regulated_codes: controlledCodes,
+            user// Send the array of controlled codes to the client
         });
     }).catch(error => {
         res.status(500).json({ success: false, error: error });
