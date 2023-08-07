@@ -57,7 +57,7 @@ router.post('/regulatory_document', verifyToken,(req, res) => {
 router.post('/ocenkaBVU', (req, res) => {
     const {organization_id} = req.body
     db.task(async t => {
-        const idshka = await t.oneOrNone(`SELECT id FROM public.assessments_bankassessment  where organization_id = $1`, [organization_id]);
+        const idshka = await t.manyOrNone(`SELECT id FROM public.assessments_bankassessment  where organization_id = $1`, [organization_id]);
         const results = {
             idshka: idshka,
         };
