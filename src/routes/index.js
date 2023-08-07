@@ -253,7 +253,7 @@ router.post('/ohvat', (req,res) => {
          print(lengthh);
          const fff = [];
          for(var j = 0; j < lengthh; j++) {
-            print(ohvat[j]['codetype_id'])
+            console.log(ohvat[j]['codetype_id'])
             fff.push(ohvat[j]['codetype_id']);
          }
         // const fff = ohvat[0]['controlled_subject_codes'];
