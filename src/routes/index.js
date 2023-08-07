@@ -88,7 +88,7 @@ router.post('/ocenkaBVU', (req, res) => {
 router.get('/ocenkaBVUobwii', (req, res) => {
     db.task(async t => {
         const idshka = await t.manyOrNone(`SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
-        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`);
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')`);
         const first = await t.manyOrNone(`select sum(point)/count(*) from public.assessments_bankinteractionlevel ab where assessment_id in
          (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
          AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`);
