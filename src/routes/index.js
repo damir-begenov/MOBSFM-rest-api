@@ -246,9 +246,15 @@ router.post('/fm1_sfm', (req, res) => {
 router.post('/ohvat', (req,res) => {
     const {bin} = req.body;
     db.task(async t => {
-        const ohvat = await t.manyOrNone(`SELECT * FROM directories_organizationcontrolledsubject
-                                          where bin = $1`, [bin]);
-        const fff = ohvat[0]['controlled_subject_codes'];
+        const ohvat = await t.manyOrNone(`SELECT * FROM accounts_organization_subject_codes
+                                          where organization_id = $1`,[bin]);
+
+         var lengthh = ohvat.length;
+         const fff = [];
+         for(var j = 0; j < lengthh; j++) {
+            fff.push(ohvat[j]['codetype_id']);
+         }
+        // const fff = ohvat[0]['controlled_subject_codes'];
         var length = fff.length;
         const code_types = [];
         const organization_ohvat_accepted = [];
