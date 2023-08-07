@@ -250,8 +250,10 @@ router.post('/ohvat', (req,res) => {
                                           where organization_id = $1`,[bin]);
 
          var lengthh = ohvat.length;
+         print(lengthh);
          const fff = [];
          for(var j = 0; j < lengthh; j++) {
+            print(ohvat[j]['codetype_id']);
             fff.push(ohvat[j]['codetype_id']);
          }
         // const fff = ohvat[0]['controlled_subject_codes'];
