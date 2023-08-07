@@ -88,18 +88,18 @@ router.post('/ocenkaBVU', (req, res) => {
 router.get('/ocenkaBVUobwii', (req, res) => {
     db.task(async t => {
         const idshka = await t.manyOrNone(`SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
-        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`, [organization_id]);
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`);
         const first = await t.manyOrNone(`select sum(point)/count(*) from public.assessments_bankinteractionlevel ab where assessment_id in
          (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
-         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`, [organization_id]);
+         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`);
         const second = await t.manyOrNone(`select sum(point)/count(*) from public.assessments_suspensionquality ab where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
-        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`, [organization_id]);
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`);
         const third = await t.manyOrNone(`select sum(point)/count(*) from public.assessments_sentmessagescorrectness where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
-        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`, [organization_id]);
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`);
         const fourth = await t.manyOrNone(`select sum(point)/count(*) from public.assessments_cashingoutbankinvolvement where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
-        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`, [organization_id]);
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`);
         const fifth = await t.manyOrNone(`select sum(point)/count(*) from public.assessments_internalrulesapplication where assessment_id in (SELECT id FROM public.assessments_bankassessment  ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
-        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`, [organization_id]);
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`);
         const results = {
             idshka: idshka,
             bankinteractionlevel: first,
