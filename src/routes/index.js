@@ -72,11 +72,11 @@ router.post('/ocenkaBVU', (req, res) => {
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1)`, [organization_id]);
         const results = {
             idshka: idshka,
-            first: first,
-            second: second,
-            third: third,
-            fourth: fourth,
-            fifth: fifth,
+            bankinteractionlevel: first,
+            suspensionquality: second,
+            sentmessagescorrectness: third,
+            cashingoutbankinvolvement: fourth,
+            internalrulesapplication: fifth,
         };
         res.json({
             results: results
