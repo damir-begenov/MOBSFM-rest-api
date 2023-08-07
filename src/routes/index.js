@@ -253,7 +253,7 @@ router.post('/ohvat', (req,res) => {
          print(lengthh);
          const fff = [];
          for(var j = 0; j < lengthh; j++) {
-            print(ohvat[j]['codetype_id']);
+            print(ohvat[j]['codetype_id'])
             fff.push(ohvat[j]['codetype_id']);
          }
         // const fff = ohvat[0]['controlled_subject_codes'];
@@ -262,7 +262,6 @@ router.post('/ohvat', (req,res) => {
         const organization_ohvat_accepted = [];
         for (var i = 0; i < length; i++) {
             // Do something with 'item', which represents each element of the array
-            try {
                 const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
                                                      where code = $1`, [fff[i]]);
                 const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
@@ -278,18 +277,12 @@ router.post('/ohvat', (req,res) => {
                     continue;
                 }
                 code_types.push(codetype);
-            } catch (error) {
-                // Handle the error if the query fails for any reason
-                console.error(`Error while querying directories_codetype: ${error.message}`);
-            }
-        }
+            } 
         res.json({
             ohvat: ohvat,
             code_types: code_types,
             organization_ohvat_accepted: organization_ohvat_accepted
         })
-    }).catch(err => {
-        res.status(500).json({ success: false, message: 'Internal server error' });
     })
 })
 
