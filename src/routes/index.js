@@ -326,9 +326,8 @@ router.post('/ohvat', (req,res) => {
 
 router.post('/vovlechennost', (req,res) => {
     const {subject_code_id} = req.body;
-    console.log(subject_code_id[0])
     db.task(async t => {
-         var lengthh = subject_code_id.size();
+         var lengthh = subject_code_id.length;
          console.log(lengthh);
         //  console.log(vovlechennost); 
         for (var i = 0; i < lengthh; i++) {
