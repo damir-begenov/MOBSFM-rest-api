@@ -298,6 +298,8 @@ router.post('/ohvat', (req,res) => {
                 const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
                                                                where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
                 codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
+                console.log(organization_ohvat[0]['count']);
+                console.log(organization_ohvat[0]['countapproved']);
                 codetype[0]['procents_of_org_names'] = (codetype[0]['count']*100)/parseFloat(organization_ohvat[0]['count']);
                 code_types.push(codetype);
                 organization_ohvat_accepted.push(organization_ohvat);
