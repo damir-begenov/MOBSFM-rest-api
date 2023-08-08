@@ -59,16 +59,16 @@ router.post('/ocenkaBVU', (req, res) => {
     db.task(async t => {
         const idshka = await t.manyOrNone(`SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1`, [organization_id]);
-        const bankinteractionlevel = await t.manyOrNone(`select ROUND(AVG(point), 2) as bankinteractionlevel from public.assessments_bankinteractionlevel ab where assessment_id in
+        const bankinteractionlevel = await t.manyOrNone(`select sum(point)/count(*) as bankinteractionlevel from public.assessments_bankinteractionlevel ab where assessment_id in
          (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
          AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1)`, [organization_id]);
-        const suspensionquality = await t.manyOrNone(`select ROUND(AVG(point), 2) as suspensionquality from public.assessments_suspensionquality ab where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
+        const suspensionquality = await t.manyOrNone(`select sum(point)/count(*) as suspensionquality from public.assessments_suspensionquality ab where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1)`, [organization_id]);
-        const sentmessagescorrectness = await t.manyOrNone(`select ROUND(AVG(point), 2) as sentmessagescorrectness from public.assessments_sentmessagescorrectness where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
+        const sentmessagescorrectness = await t.manyOrNone(`select sum(point)/count(*) as sentmessagescorrectness from public.assessments_sentmessagescorrectness where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')  and organization_id = $1)`, [organization_id]);
-        const cashingoutbankinvolvement = await t.manyOrNone(`select ROUND(AVG(point), 2) as cashingoutbankinvolvement from public.assessments_cashingoutbankinvolvement where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
+        const cashingoutbankinvolvement = await t.manyOrNone(`select sum(point)/count(*) as cashingoutbankinvolvement from public.assessments_cashingoutbankinvolvement where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')  and organization_id = $1)`, [organization_id]);
-        const internalrulesapplication = await t.manyOrNone(`select ROUND(AVG(point), 2) as internalrulesapplication from public.assessments_internalrulesapplication where assessment_id in (SELECT id FROM public.assessments_bankassessment  ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
+        const internalrulesapplication = await t.manyOrNone(`select sum(point)/count(*) as internalrulesapplication from public.assessments_internalrulesapplication where assessment_id in (SELECT id FROM public.assessments_bankassessment  ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1)`, [organization_id]);
         const results = {
             idshka: idshka,
