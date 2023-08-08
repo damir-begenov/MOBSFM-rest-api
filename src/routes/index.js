@@ -331,6 +331,7 @@ router.post('/vovlechennost', (req,res) => {
          var lengthh = vovlechennost.length;
         //  console.log(vovlechennost); 
         for (var i = 0; i < lengthh; i++) {
+            console.log(subject_code_id[i]);
             // Do something with 'item', which represents each element of the array
                 const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
                                                      where id = $1`, [subject_code_id[i]]);
