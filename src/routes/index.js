@@ -389,34 +389,34 @@ router.post('/ratingSFM', (req,res) => {
                 const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
                                                                where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
             
-                let vovlechennost_good = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
+                let rating_good = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
                FROM assessments_assessment 
                INNER JOIN assessments_assessmentitem AS items ON assessments_assessment.id = items.assessment_id 
                where "date" >= '2023-08-01' and organization_id in 
                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
                 group by organization_id ) asd where p_points >= 5 and p_points <=19`,[subject_code_id[i]]); 
-                let vovlechennost_satis = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
+                let rating_satis = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
                FROM assessments_assessment 
                INNER JOIN assessments_assessmentitem AS items ON assessments_assessment.id = items.assessment_id 
                where "date" >= '2023-08-01' and organization_id in 
                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
                 group by organization_id ) asd where p_points >= 3 and p_points <=4`,[subject_code_id[i]]); 
-                let vovlechennost_bad = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
+                let rating_bad = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
                FROM assessments_assessment 
                INNER JOIN assessments_assessmentitem AS items ON assessments_assessment.id = items.assessment_id 
                where "date" >= '2023-08-01' and organization_id in 
                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
                 group by organization_id ) asd where p_points >= 1 and p_points <=2`,[subject_code_id[i]]); 
-                let vovlechennost_no_grade = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
+                let rating_no_grade = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
                FROM assessments_assessment 
                INNER JOIN assessments_assessmentitem AS items ON assessments_assessment.id = items.assessment_id 
                where "date" >= '2023-08-01' and organization_id in 
                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
                 group by organization_id ) asd where p_points = 0 `,[subject_code_id[i]]);
-                codetype[0]['vovlechennost_good'] = vovlechennost_good; 
-                codetype[0]['vovlechennost_satis'] = vovlechennost_satis; 
-                codetype[0]['vovlechennost_bad'] = vovlechennost_bad; 
-                codetype[0]['vovlechennost_no_grade'] = vovlechennost_no_grade; 
+                codetype[0]['rating_good'] = rating_good; 
+                codetype[0]['rating_satis'] = rating_satis; 
+                codetype[0]['rating_bad'] = rating_bad; 
+                codetype[0]['rating_no_grade'] = rating_no_grade; 
 
                 codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
                 codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
