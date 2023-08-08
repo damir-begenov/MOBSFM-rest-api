@@ -324,6 +324,7 @@ router.post('/ohvat', (req,res) => {
 
 router.post('/vovlechennost', (req,res) => {
     const {subject_code_id} = req.body;
+    console.log(subject_code_id);
     db.task(async t => {
         const vovlechennost = await t.manyOrNone(`select count(distinct(organization_id)) from( 
             SELECT distinct(organization_id),  SUM(items.point) AS ass_points 
@@ -334,7 +335,7 @@ router.post('/vovlechennost', (req,res) => {
                 (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
                 GROUP BY organization_id, sess.date) AS ass 
             where ass.ass_points>2 and ass.ass_points<=24 
-            `,[subject_code_id]);
+            `,[subject_code_id[0]['id']]);
 
          var lengthh = vovlechennost.length;
          console.log(vovlechennost); 
