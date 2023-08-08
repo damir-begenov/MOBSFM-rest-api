@@ -331,13 +331,12 @@ router.post('/vovlechennost', (req,res) => {
          console.log(lengthh);
         //  console.log(vovlechennost); 
         for (var i = 0; i < lengthh; i++) {
-            console.log(subject_code_id[i]);
             // Do something with 'item', which represents each element of the array
                 const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
                                                      where id = $1`, [subject_code_id[i]]);
                 const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
                                                                where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
-             
+            
                const vovlechennost = await t.manyOrNone(`select count(distinct(organization_id)) from( 
                                                                 SELECT distinct(organization_id),  SUM(items.point) AS ass_points 
                                                                     FROM assessments_assessment AS sess 
@@ -352,8 +351,8 @@ router.post('/vovlechennost', (req,res) => {
                 codetype[0]['countapproved'] = parseFloat(vovlechennost[0]['count']);
                 codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
                 percentage += codetype[0]['procents_of_org_names'];
-                // console.log(organization_ohvat[0]);
-                // console.log(codetype[0]);
+                console.log(organization_ohvat[0]);
+                console.log(codetype[0]);
 
                 code_types.push(codetype[0]);
                 organization_ohvat_accepted.push(organization_ohvat);
