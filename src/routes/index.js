@@ -368,7 +368,7 @@ router.post('/vovlechennost', (req,res) => {
         res.json({
             code_types: code_types,
             organization_ohvat_accepted: organization_ohvat_accepted,
-            percentage: percentage/(length),
+            percentage: percentage/(lengthh),
         })
     })
 })
