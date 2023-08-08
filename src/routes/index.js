@@ -301,7 +301,7 @@ router.post('/ohvat', (req,res) => {
                 console.log(organization_ohvat[0]);
                 console.log(codetype[0]);
 
-                code_types.push(codetype);
+                code_types.push(codetype[0]);
                 organization_ohvat_accepted.push(organization_ohvat);
                 if (codetype.length === 0) {
                     // Handle the case when code is not found in directories_codetype table
