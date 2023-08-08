@@ -288,6 +288,7 @@ router.post('/ohvat', (req,res) => {
         var length = fff.length;
         const code_types = [];
         const organization_ohvat_accepted = [];
+        var percentage = 0;
         for (var i = 0; i < length; i++) {
             // Do something with 'item', which represents each element of the array
                 const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
@@ -295,10 +296,8 @@ router.post('/ohvat', (req,res) => {
                 const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
                                                                where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
                 codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
-                console.log(organization_ohvat[0]['count']);
-                console.log(organization_ohvat[0]['countapproved']);
-                console.log(codetype[0]['count']);
-                codetype[0]['procents_of_org_names'] = (codetype[0]['count']*100)/parseFloat(organization_ohvat[0]['count']);
+                codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
+                percentage += codetype[0]['procents_of_org_names'];
                 code_types.push(codetype);
                 organization_ohvat_accepted.push(organization_ohvat);
                 if (codetype.length === 0) {
@@ -312,7 +311,8 @@ router.post('/ohvat', (req,res) => {
         res.json({
             ohvat: ohvat,
             code_types: code_types,
-            organization_ohvat_accepted: organization_ohvat_accepted
+            organization_ohvat_accepted: organization_ohvat_accepted,
+            percentage: percentage/(length*2),
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error' });
