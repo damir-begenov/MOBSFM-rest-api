@@ -7,7 +7,7 @@ require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const {auth} = require("firebase-admin");
 var randtoken = require('rand-token')
-const {or} = require("sequelize");
+const {or, where} = require("sequelize");
 
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
@@ -298,6 +298,9 @@ router.post('/ohvat', (req,res) => {
                 codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
                 codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
                 percentage += codetype[0]['procents_of_org_names'];
+                console.log(organization_ohvat[0]);
+                console.log(codetype[0]);
+
                 code_types.push(codetype);
                 organization_ohvat_accepted.push(organization_ohvat);
                 if (codetype.length === 0) {
