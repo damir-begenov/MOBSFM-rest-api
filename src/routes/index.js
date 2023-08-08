@@ -328,7 +328,6 @@ router.post('/vovlechennost', (req,res) => {
     const {subject_code_id} = req.body;
     db.task(async t => {
          var lengthh = subject_code_id.length;
-         console.log(lengthh);
          const code_types = [];
          const organization_ohvat_accepted = [];
          var percentage = 0;
@@ -354,8 +353,8 @@ router.post('/vovlechennost', (req,res) => {
                 codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
                 codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
                 percentage += codetype[0]['procents_of_org_names'];
-                console.log(organization_ohvat[0]);
-                console.log(codetype[0]);
+                console.log(organization_ohvat[0]['countapproved']);
+                console.log(codetype[0]['procents_of_org_names']);
                 code_types.push(codetype[0]);
                 organization_ohvat_accepted.push(organization_ohvat);
                 if (codetype.length === 0) {
