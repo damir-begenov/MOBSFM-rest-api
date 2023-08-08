@@ -329,6 +329,8 @@ router.post('/vovlechennost', (req,res) => {
     db.task(async t => {
          var lengthh = subject_code_id.length;
          console.log(lengthh);
+         const code_types = [];
+         const organization_ohvat_accepted = [];
         //  console.log(vovlechennost); 
         for (var i = 0; i < lengthh; i++) {
             // Do something with 'item', which represents each element of the array
@@ -353,7 +355,6 @@ router.post('/vovlechennost', (req,res) => {
                 percentage += codetype[0]['procents_of_org_names'];
                 console.log(organization_ohvat[0]);
                 console.log(codetype[0]);
-
                 code_types.push(codetype[0]);
                 organization_ohvat_accepted.push(organization_ohvat);
                 if (codetype.length === 0) {
