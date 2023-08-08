@@ -309,7 +309,6 @@ router.post('/ohvat', (req,res) => {
                     console.log(`Code ${controlled[i]} not found in directories_codetype table.`);
                     continue;
                 }
-                code_types.push(codetype);
             } 
         res.json({
             ohvat: ohvat,
