@@ -380,6 +380,7 @@ router.post('/ratingSFM', (req,res) => {
          const code_types = [];
          const organization_ohvat_accepted = [];
          var percentage = 0;
+         const vovlechennost = [];
         //  console.log(vovlechennost); 
         for (var i = 0; i < lengthh; i++) {
             // Do something with 'item', which represents each element of the array
