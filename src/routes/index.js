@@ -919,7 +919,7 @@ router.post('/checkSession', verifyToken,(req, res) => {
 
                     const controlledCodes = controlled.map(item => parseInt(item.codetype_id));
 
-                    const subject_codes = await t.manyOrNone('SELECT name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
+                    const subject_codes = await t.manyOrNone('SELECT id, name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
                     organization.regulated_codes = subject_codes;
                 }
 
