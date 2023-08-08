@@ -643,6 +643,18 @@ router.post('/getQuestionnaires', verifyToken,(req, res) => {
                                                                  FROM questionnaire_questionnaireresult
                                                                  WHERE organization_id = $1`, [organization_id]);
         }
+        else{
+            questionnaires = await t.many(`SELECT *
+                                                 FROM questionnaire_questionnaire qq
+                                                 where qq.category = $1
+                                                   and qq.id in (SELECT questionnaire_id
+                                                                 FROM questionnaire_questionnaire_subject_codes
+                                                                 where codetype_id = '2')`, [category]);
+
+            completed_questionnaires = await t.manyOrNone(`SELECT questionnaire_id
+                                                                 FROM questionnaire_questionnaireresult
+                                                                 WHERE organization_id = $1`, [organization_id]);
+        }
         res.json({
             questionnaires: questionnaires,
             completed_questionnaires: completed_questionnaires,
