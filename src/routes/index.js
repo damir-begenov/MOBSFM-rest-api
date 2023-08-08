@@ -326,23 +326,48 @@ router.post('/ohvat', (req,res) => {
 
 router.post('/vovlechennost', (req,res) => {
     const {subject_code_id} = req.body;
-    console.log(subject_code_id);
+    console.log(subject_code_id)
     db.task(async t => {
-        const vovlechennost = await t.manyOrNone(`select count(distinct(organization_id)) from( 
-            SELECT distinct(organization_id),  SUM(items.point) AS ass_points 
-                FROM assessments_assessment AS sess 
-                LEFT JOIN assessments_assessmentitem AS items ON sess.id = items.assessment_id 
-                WHERE organization_id IS NOT null and sess.date >= date_trunc('month', current_date) + INTERVAL '1 day'
-                AND sess.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id in  
-                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
-                GROUP BY organization_id, sess.date) AS ass 
-            where ass.ass_points>2 and ass.ass_points<=24 
-            `,[subject_code_id[0]['id']]);
-
          var lengthh = vovlechennost.length;
         //  console.log(vovlechennost); 
+        for (var i = 0; i < lengthh; i++) {
+            // Do something with 'item', which represents each element of the array
+                const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
+                                                     where id = $1`, [subject_code_id[i]]);
+                const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
+                                                               where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
+             
+               const vovlechennost = await t.manyOrNone(`select count(distinct(organization_id)) from( 
+                                                                SELECT distinct(organization_id),  SUM(items.point) AS ass_points 
+                                                                    FROM assessments_assessment AS sess 
+                                                                    LEFT JOIN assessments_assessmentitem AS items ON sess.id = items.assessment_id 
+                                                                    WHERE organization_id IS NOT null and sess.date >= date_trunc('month', current_date) + INTERVAL '1 day'
+                                                                    AND sess.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id in  
+                                                                    (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
+                                                                    GROUP BY organization_id, sess.date) AS ass 
+                                                                where ass.ass_points>2 and ass.ass_points<=24 
+                                                                `,[subject_code_id[i]]); 
+                console.log(vovlechennost);    
+                codetype[0]['countapproved'] = parseFloat(vovlechennost[0]['count']);
+                codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
+                percentage += codetype[0]['procents_of_org_names'];
+                // console.log(organization_ohvat[0]);
+                // console.log(codetype[0]);
+
+                code_types.push(codetype[0]);
+                organization_ohvat_accepted.push(organization_ohvat);
+                if (codetype.length === 0) {
+                    // Handle the case when code is not found in directories_codetype table
+                    // For example, you could skip it or log an error message.
+                    console.log(`Code ${controlled[i]} not found in directories_codetype table.`);
+                    continue;
+                }
+            } 
         res.json({
-            vovlechennost: vovlechennost,
+            ohvat: ohvat,
+            code_types: code_types,
+            organization_ohvat_accepted: organization_ohvat_accepted,
+            percentage: percentage/(length),
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error' });
