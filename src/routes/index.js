@@ -415,7 +415,7 @@ router.post('/ratingSFM', (req,res) => {
                 group by organization_id ) asd where p_points = 0 `,[subject_code_id[i]]);
                 console.log(rating_good['count']);
                 console.log(rating_good[0]);
-                console.log(rating_good);
+                console.log(rating_good[0]['count']);
 
 
                 codetype[0]['rating_good'] = rating_good['count']; 
