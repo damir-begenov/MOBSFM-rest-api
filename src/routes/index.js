@@ -320,6 +320,31 @@ router.post('/ohvat', (req,res) => {
 })
 
 
+router.post('/vovlechennost', (req,res) => {
+    const {subject_code_id} = req.body;
+    db.task(async t => {
+        const vovlechennost = await t.manyOrNone(`select count(distinct(organization_id)) from( 
+            SELECT distinct(organization_id),  SUM(items.point) AS ass_points 
+                FROM assessments_assessment AS sess 
+                LEFT JOIN assessments_assessmentitem AS items ON sess.id = items.assessment_id 
+                WHERE organization_id IS NOT null and sess.date >= date_trunc('month', current_date) + INTERVAL '1 day'
+                AND sess.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id in  
+                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
+                GROUP BY organization_id, sess.date) AS ass 
+            where ass.ass_points>2 and ass.ass_points<=24 
+            `,[subject_code_id]);
+
+         var lengthh = vovlechennost.length;
+         console.log(vovlechennost); 
+        res.json({
+            vovlechennost: vovlechennost,
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    });
+})
+
+
 router.get('/risk', (req, res) => {
     db.task(async t => {
         const risk = await t.manyOrNone('SELECT * FROM mutual_evaluation_mutualevaluationmaterialcategory');
