@@ -9,9 +9,11 @@ const {auth} = require("firebase-admin");
 var randtoken = require('rand-token')
 const {or, where} = require("sequelize");
 
-const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
+const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME, DB_NAME_TEST, DB_HOST_TEST, DB_PASSWORD_TEST } = process.env;
 const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const db = pgp(connectionString);
+const testConnectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD_TEST}@${DB_HOST_TEST}:${DB_PORT}/${DB_NAME_TEST}`;
+const testDb = pgp(testConnectionString);
 const requestLogger = require('../middleware/requestLogger.js');
 
 // Use the requestLogger middleware before your routes
@@ -634,7 +636,7 @@ router.post('/postRuleViolation', verifyToken, async (req, res) => {
         `;
         const ruleViolationValues = [now, now, binOrgViolator, amount, description, article, creatorOrgId, subject_code_id, date];
 
-        await db.one(ruleViolationQuery, ruleViolationValues);
+        await testDb.one(ruleViolationQuery, ruleViolationValues);
 
 
         res.json({success: true, user});
@@ -662,7 +664,7 @@ router.post('/postResults', async (req, res) => {
       RETURNING id;
     `;
         const questionnaireResultValues = [now, now, organization_id, questionnaire_id];
-        const { id: questionnaire_result_id } = await db.one(questionnaireResultQuery, questionnaireResultValues);
+        const { id: questionnaire_result_id } = await testDb.one(questionnaireResultQuery, questionnaireResultValues);
 
         const questionnaireAnswerValues = parsedTestResults.map((result) => [
             now,
@@ -678,7 +680,7 @@ router.post('/postResults', async (req, res) => {
       VALUES ($1, $2, $3, $4, $5, $6)
     `;
 
-        await db.tx(async (t) => {
+        await testDb.tx(async (t) => {
             // Using transaction to execute all insert queries as a single unit of work
             const insertQueries = questionnaireAnswerValues.map((values) => t.none(questionnaireAnswerQuery, values));
             await t.batch(insertQueries);
