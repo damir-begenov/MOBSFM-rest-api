@@ -298,8 +298,8 @@ router.post('/ohvat', (req,res) => {
                 codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
                 codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
                 percentage += codetype[0]['procents_of_org_names'];
-                console.log(organization_ohvat[0]);
-                console.log(codetype[0]);
+                // console.log(organization_ohvat[0]);
+                // console.log(codetype[0]);
 
                 code_types.push(codetype[0]);
                 organization_ohvat_accepted.push(organization_ohvat);
@@ -338,7 +338,7 @@ router.post('/vovlechennost', (req,res) => {
             `,[subject_code_id[0]['id']]);
 
          var lengthh = vovlechennost.length;
-         console.log(vovlechennost); 
+        //  console.log(vovlechennost); 
         res.json({
             vovlechennost: vovlechennost,
         })
