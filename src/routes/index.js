@@ -104,11 +104,11 @@ router.get('/ocenkaBVUobwii', (req, res) => {
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day'))`);
         const results = {
             idshka: idshka,
-            bankinteractionlevel: bankinteractionlevel,
-            suspensionquality: suspensionquality,
-            sentmessagescorrectness: sentmessagescorrectness,
-            cashingoutbankinvolvement: cashingoutbankinvolvement,
-            internalrulesapplication: internalrulesapplication,
+            bankinteractionlevel: bankinteractionlevel[0]['bankinteractionlevel'],
+            suspensionquality: suspensionquality[0]['suspensionquality'],
+            sentmessagescorrectness: sentmessagescorrectness[0]['sentmessagescorrectness'],
+            cashingoutbankinvolvement: cashingoutbankinvolvement[0]['cashingoutbankinvolvement'],
+            internalrulesapplication: internalrulesapplication[0]['internalrulesapplication'],
         };
         res.json({
             results: results
