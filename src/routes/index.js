@@ -372,6 +372,51 @@ router.post('/vovlechennost', (req,res) => {
 })
 
 
+
+router.post('/ratingSFM', (req,res) => {
+    const {subject_code_id} = req.body;
+    db.task(async t => {
+         var lengthh = subject_code_id.length;
+         const code_types = [];
+         const organization_ohvat_accepted = [];
+         var percentage = 0;
+        //  console.log(vovlechennost); 
+        for (var i = 0; i < lengthh; i++) {
+            // Do something with 'item', which represents each element of the array
+                const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
+                                                     where id = $1`, [subject_code_id[i]]);
+                const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
+                                                               where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
+            
+               const vovlechennost = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
+               FROM assessments_assessment 
+               INNER JOIN assessments_assessmentitem AS items ON assessments_assessment.id = items.assessment_id 
+               where "date" >= '2023-08-01' and organization_id in 
+               (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
+                group by organization_id ) asd where p_points >= 5 and p_points <=19`,[subject_code_id[i]]); 
+                codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
+                codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
+                percentage += codetype[0]['procents_of_org_names'];
+                code_types.push(codetype[0]);
+                organization_ohvat_accepted.push(organization_ohvat);
+                if (codetype.length === 0) {
+                    // Handle the case when code is not found in directories_codetype table
+                    // For example, you could skip it or log an error message.
+                    console.log(`Code ${controlled[i]} not found in directories_codetype table.`);
+                    continue;
+                }
+            } 
+        res.json({
+            code_types: code_types,
+            vovlechennost: vovlechennost,
+            organization_ohvat_accepted: organization_ohvat_accepted,
+            percentage: percentage/(lengthh),
+        })
+    })
+})
+
+
+
 router.get('/risk', (req, res) => {
     db.task(async t => {
         const risk = await t.manyOrNone('SELECT * FROM mutual_evaluation_mutualevaluationmaterialcategory');
