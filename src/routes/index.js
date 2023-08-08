@@ -389,7 +389,7 @@ router.post('/ratingSFM', (req,res) => {
                 const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
                                                                where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
             
-               const vovlechennost = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
+                vovlechennost = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
                FROM assessments_assessment 
                INNER JOIN assessments_assessmentitem AS items ON assessments_assessment.id = items.assessment_id 
                where "date" >= '2023-08-01' and organization_id in 
