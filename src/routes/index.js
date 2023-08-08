@@ -283,7 +283,6 @@ router.post('/ohvat', (req,res) => {
          console.log(ohvat);
          const fff = [];
          for(var j = 0; j < lengthh; j++) {
-            console.log(ohvat[j]['codetype_id'])
             fff.push(ohvat[j]['codetype_id']);
             console.log(fff[j]);
          }
@@ -300,6 +299,7 @@ router.post('/ohvat', (req,res) => {
                 codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
                 console.log(organization_ohvat[0]['count']);
                 console.log(organization_ohvat[0]['countapproved']);
+                console.log(codetype[0]['count']);
                 codetype[0]['procents_of_org_names'] = (codetype[0]['count']*100)/parseFloat(organization_ohvat[0]['count']);
                 code_types.push(codetype);
                 organization_ohvat_accepted.push(organization_ohvat);
