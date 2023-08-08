@@ -312,7 +312,7 @@ router.post('/ohvat', (req,res) => {
             ohvat: ohvat,
             code_types: code_types,
             organization_ohvat_accepted: organization_ohvat_accepted,
-            percentage: percentage/(length*2),
+            percentage: percentage/(length),
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error' });
