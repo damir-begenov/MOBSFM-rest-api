@@ -370,9 +370,7 @@ router.post('/vovlechennost', (req,res) => {
             organization_ohvat_accepted: organization_ohvat_accepted,
             percentage: percentage/(length),
         })
-    }).catch(error => {
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    });
+    })
 })
 
 
