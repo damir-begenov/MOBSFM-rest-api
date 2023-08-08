@@ -627,7 +627,7 @@ router.post('/getQuestionnaires', verifyToken,(req, res) => {
     db.task(async t => {
         let questionnaires = []
         let completed_questionnaires = []
-        if(subject_code !== null) {
+        if(subject_code !== '') {
             questionnaires = await t.many(`SELECT *
                                                  FROM questionnaire_questionnaire qq
                                                  where qq.category = $1
