@@ -331,6 +331,7 @@ router.post('/vovlechennost', (req,res) => {
          console.log(lengthh);
          const code_types = [];
          const organization_ohvat_accepted = [];
+         var percentage = 0;
         //  console.log(vovlechennost); 
         for (var i = 0; i < lengthh; i++) {
             // Do something with 'item', which represents each element of the array
