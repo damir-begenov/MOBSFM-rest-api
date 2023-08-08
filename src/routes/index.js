@@ -400,13 +400,13 @@ router.post('/ratingSFM', (req,res) => {
                INNER JOIN assessments_assessmentitem AS items ON assessments_assessment.id = items.assessment_id 
                where "date" >= '2023-08-01' and organization_id in 
                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
-                group by organization_id ) asd where p_points >= 4 and p_points <=3`,[subject_code_id[i]]); 
+                group by organization_id ) asd where p_points >= 3 and p_points <=4`,[subject_code_id[i]]); 
                 let vovlechennost_bad = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
                FROM assessments_assessment 
                INNER JOIN assessments_assessmentitem AS items ON assessments_assessment.id = items.assessment_id 
                where "date" >= '2023-08-01' and organization_id in 
                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
-                group by organization_id ) asd where p_points >= 2 and p_points <=1`,[subject_code_id[i]]); 
+                group by organization_id ) asd where p_points >= 1 and p_points <=2`,[subject_code_id[i]]); 
                 let vovlechennost_no_grade = await t.manyOrNone(`select count(organization_id) from (SELECT organization_id, SUM(items.point) AS p_points 
                FROM assessments_assessment 
                INNER JOIN assessments_assessmentitem AS items ON assessments_assessment.id = items.assessment_id 
