@@ -413,6 +413,11 @@ router.post('/ratingSFM', (req,res) => {
                where "date" >= '2023-08-01' and organization_id in 
                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
                 group by organization_id ) asd where p_points = 0 `,[subject_code_id[i]]);
+                console.log(rating_good['count']);
+                console.log(rating_good[0]);
+                console.log(rating_good);
+
+
                 codetype[0]['rating_good'] = rating_good['count']; 
                 codetype[0]['rating_satis'] = rating_satis['count']; 
                 codetype[0]['rating_bad'] = rating_bad['count']; 
