@@ -75,10 +75,10 @@ router.post('/ocenkaBVU', (req, res) => {
         const results = {
             idshka: idshka,
             bankinteractionlevel: bankinteractionlevel[0]['bankinteractionlevel'],
-            suspensionquality: suspensionquality,
-            sentmessagescorrectness: sentmessagescorrectness,
-            cashingoutbankinvolvement: cashingoutbankinvolvement,
-            internalrulesapplication: internalrulesapplication,
+            suspensionquality: suspensionquality[0]['suspensionquality'],
+            sentmessagescorrectness: sentmessagescorrectness[0]['sentmessagescorrectness'],
+            cashingoutbankinvolvement: cashingoutbankinvolvement[0]['cashingoutbankinvolvement'],
+            internalrulesapplication: internalrulesapplication[0]['internalrulesapplication'],
         };
         res.json({
             results: results
