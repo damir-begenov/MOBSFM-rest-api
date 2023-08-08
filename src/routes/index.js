@@ -280,17 +280,15 @@ router.post('/ohvat', (req,res) => {
                                           where organization_id = $1`,[bin]);
 
          var lengthh = ohvat.length;
-         console.log(ohvat);
          const fff = [];
          for(var j = 0; j < lengthh; j++) {
-            console.log(ohvat[j]['codetype_id'])
             fff.push(ohvat[j]['codetype_id']);
-            console.log(fff[j]);
          }
         // const fff = ohvat[0]['controlled_subject_codes'];
         var length = fff.length;
         const code_types = [];
         const organization_ohvat_accepted = [];
+        var percentage = 0;
         for (var i = 0; i < length; i++) {
             // Do something with 'item', which represents each element of the array
                 const codetype = await t.manyOrNone(`SELECT * FROM directories_codetype
@@ -298,7 +296,8 @@ router.post('/ohvat', (req,res) => {
                 const organization_ohvat = await t.manyOrNone(`SELECT count(*) FROM accounts_organization
                                                                where subject_code_id = $1 and status = 'approved'`, [codetype[0]['id']]);
                 codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
-                codetype[0]['procents_of_org_names'] = (codetype[0]['count']*100)/parseFloat(organization_ohvat[0]['count']);
+                codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
+                percentage += codetype[0]['procents_of_org_names'];
                 code_types.push(codetype);
                 organization_ohvat_accepted.push(organization_ohvat);
                 if (codetype.length === 0) {
@@ -312,7 +311,33 @@ router.post('/ohvat', (req,res) => {
         res.json({
             ohvat: ohvat,
             code_types: code_types,
-            organization_ohvat_accepted: organization_ohvat_accepted
+            organization_ohvat_accepted: organization_ohvat_accepted,
+            percentage: percentage/(length),
+        })
+    }).catch(error => {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    });
+})
+
+
+router.post('/vovlechennost', (req,res) => {
+    const {subject_code_id} = req.body;
+    db.task(async t => {
+        const vovlechennost = await t.manyOrNone(`select count(distinct(organization_id)) from( 
+            SELECT distinct(organization_id),  SUM(items.point) AS ass_points 
+                FROM assessments_assessment AS sess 
+                LEFT JOIN assessments_assessmentitem AS items ON sess.id = items.assessment_id 
+                WHERE organization_id IS NOT null and sess.date >= date_trunc('month', current_date) + INTERVAL '1 day'
+                AND sess.date < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id in  
+                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
+                GROUP BY organization_id, sess.date) AS ass 
+            where ass.ass_points>2 and ass.ass_points<=24 
+            `,[subject_code_id]);
+
+         var lengthh = vovlechennost.length;
+         console.log(vovlechennost); 
+        res.json({
+            vovlechennost: vovlechennost,
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error' });
