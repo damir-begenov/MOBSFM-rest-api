@@ -602,10 +602,20 @@ router.post('/getQuestionnaires', verifyToken,(req, res) => {
     const { category, subject_code, organization_id } = req.body;
     const user = req.user;
     db.task(async t => {
-        const questionnaires = await t.many(`SELECT * FROM questionnaire_questionnaire qq  where qq.category = $1 and qq.id in (SELECT questionnaire_id FROM questionnaire_questionnaire_subject_codes where codetype_id = $2)`, [category, subject_code]);
+        let questionnaires = []
+        let completed_questionnaires = []
+        if(subject_code != null) {
+            questionnaires = await t.many(`SELECT *
+                                                 FROM questionnaire_questionnaire qq
+                                                 where qq.category = $1
+                                                   and qq.id in (SELECT questionnaire_id
+                                                                 FROM questionnaire_questionnaire_subject_codes
+                                                                 where codetype_id = $2)`, [category, subject_code]);
 
-        const completed_questionnaires = await t.manyOrNone(`SELECT questionnaire_id FROM questionnaire_questionnaireresult WHERE organization_id = $1`, [organization_id]);
-
+            completed_questionnaires = await t.manyOrNone(`SELECT questionnaire_id
+                                                                 FROM questionnaire_questionnaireresult
+                                                                 WHERE organization_id = $1`, [organization_id]);
+        }
         res.json({
             questionnaires: questionnaires,
             completed_questionnaires: completed_questionnaires,
