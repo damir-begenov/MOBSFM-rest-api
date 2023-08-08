@@ -348,7 +348,7 @@ router.post('/vovlechennost', (req,res) => {
                                                                 where ass.ass_points>2 and ass.ass_points<=24 
                                                                 `,[subject_code_id[i]]); 
                 console.log(vovlechennost[0]['count']);    
-                codetype[0]['countapproved'] = parseFloat(vovlechennost[0]['count']);
+                codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
                 codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
                 percentage += codetype[0]['procents_of_org_names'];
                 console.log(organization_ohvat[0]);
