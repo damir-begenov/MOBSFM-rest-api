@@ -1090,6 +1090,7 @@ router.post('/checkSession',(req, res) => {
                     success: true,
                     message: 'Login successful',
                     organization: organization,
+                    user: user,
                 });
             } else {
                 // Organization not found
