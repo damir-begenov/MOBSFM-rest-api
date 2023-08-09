@@ -963,14 +963,30 @@ router.post('/fmReview', (req, res) => {
         });
     })
 
-router.post('/checkSession', verifyToken,(req, res) => {
-    console.log("Checking...")
-    const {iin, org_id, user} = req.body;
+router.post('/checkSession',(req, res) => {
+    const {iin, org_id} = req.body;
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         if (user) {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
             if (organization) {
+                const secretKey = process.env.SECRET_KEY;
+                const token = jwt.sign(
+                    {
+                        "user_id": user.id,
+                        "user_iin": user.iin,
+                        "org_id": organization.id,
+                        "org_iin": organization.iin
+                    },
+                    secretKey,
+                    {
+                        expiresIn: "1h",
+                    }
+                );
+
+                // save user token
+                user.token = token;
+                console.log(token)
                 const cfmCode = organization['subject_code_id'];
                 let docType = null;
                 let user_document = null;
@@ -1073,7 +1089,6 @@ router.post('/checkSession', verifyToken,(req, res) => {
                 res.json({
                     success: true,
                     message: 'Login successful',
-                    user: user,
                     organization: organization,
                 });
             } else {
