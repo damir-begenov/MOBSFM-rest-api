@@ -964,6 +964,7 @@ router.post('/fmReview', (req, res) => {
     })
 
 router.post('/checkSession', verifyToken,(req, res) => {
+    console.log("Checking...")
     const {iin, org_id, user} = req.body;
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
