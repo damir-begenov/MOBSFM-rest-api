@@ -424,7 +424,8 @@ router.post('/ratingSFM', (req,res) => {
                 codetype[0]['rating_no_grade'] = rating_no_grade[0]['count']; 
 
                 codetype[0]['countapproved'] = parseFloat(organization_ohvat[0]['count']);
-                codetype[0]['procents_of_org_names'] = (organization_ohvat[0]['count']*100)/parseFloat(codetype[0]['count']);
+                codetype[0]['procents_of_org_names'] = (parseFloat(rating_good[0]['count'])*100)/(parseFloat(rating_good[0]['count'])+ parseFloat(rating_satis[0]['count'])+ parseFloat(rating_bad[0]['count']));
+                if(codetype[0]['procents_of_org_names'] == null) { codetype[0]['procents_of_org_names'] = '0'}
                 percentage += codetype[0]['procents_of_org_names'];
                 code_types.push(codetype[0]);
                 organization_ohvat_accepted.push(organization_ohvat);
