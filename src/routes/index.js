@@ -1029,10 +1029,10 @@ router.post('/checkSession', verifyToken,(req, res) => {
                     const controlledCodes = controlled.map(item => parseInt(item.codetype_id));
 
                     const subject_codes = await t.manyOrNone('SELECT id, name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
+                    console.log(subject_codes);
                     organization.regulated_codes = subject_codes;
                 }
 
-                console.log(organization.regulated_codes);
                 user.userRole = userRole[0]['role'];
 
                 const colors = {
@@ -1167,6 +1167,20 @@ router.post('/login', (req, res) => {
                 }
 
                 organization.orgType = orgType['type'];
+
+                if(organization.orgType === 'state_body'){
+                    const controlled = await t.manyOrNone(
+                        `SELECT codetype_id FROM accounts_organization_subject_codes
+                        WHERE organization_id = $1`, [organization.id]
+                    );
+
+                    const controlledCodes = controlled.map(item => parseInt(item.codetype_id));
+
+                    const subject_codes = await t.manyOrNone('SELECT id, name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
+                    console.log(subject_codes);
+                    organization.regulated_codes = subject_codes;
+                }
+
                 organization.address = org_address;
 
                 const colors = {
