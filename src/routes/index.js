@@ -275,9 +275,8 @@ router.post('/fm1_sfm', (req, res) => {
     })
 })
 
-router.post('/ohvat', verifyToken,(req,res) => {
+router.post('/ohvat',(req,res) => {
     const {bin} = req.body;
-    const user = req.user;
     db.task(async t => {
         const ohvat = await t.manyOrNone(`SELECT * FROM accounts_organization_subject_codes
                                           where organization_id = $1`,[bin]);
@@ -319,7 +318,6 @@ router.post('/ohvat', verifyToken,(req,res) => {
             code_types: code_types,
             organization_ohvat_accepted: organization_ohvat_accepted,
             percentage: percentage/(length),
-            user: user
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error' });
