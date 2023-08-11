@@ -56,8 +56,9 @@ router.post('/regulatory_document', verifyToken,(req, res) => {
     });
 });
 
-router.post('/ocenkaBVU', (req, res) => {
+router.post('/ocenkaBVU', verifyToken, (req, res) => {
     const {organization_id} = req.body
+    const user = req.user;
     db.task(async t => {
         const idshka = await t.manyOrNone(`SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1`, [organization_id]);
@@ -81,13 +82,15 @@ router.post('/ocenkaBVU', (req, res) => {
             internalrulesapplication: internalrulesapplication[0]['internalrulesapplication'],
         };
         res.json({
-            results: results
+            results: results,
+            user: user
         });
     })
 })
 
 
-router.get('/ocenkaBVUobwii', (req, res) => {
+router.get('/ocenkaBVUobwii', verifyToken, (req, res) => {
+    const user = req.user;
     db.task(async t => {
         const idshka = await t.manyOrNone(`SELECT id FROM public.assessments_bankassessment ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')`);
@@ -111,7 +114,8 @@ router.get('/ocenkaBVUobwii', (req, res) => {
             internalrulesapplication: internalrulesapplication[0]['internalrulesapplication'],
         };
         res.json({
-            results: results
+            results: results,
+            user: user
         });
     })
 })
@@ -284,7 +288,7 @@ router.post('/ohvat',(req,res) => {
          var lengthh = ohvat.length;
          const fff = [];
          for(var j = 0; j < lengthh; j++) {
-            if(ohvat[j]['codetype_id'] != "39" && ohvat[j]['codetype_id'] != "1"){
+            if(ohvat[j]['codetype_id'] !== "39" && ohvat[j]['codetype_id'] !== "1"){
             fff.push(ohvat[j]['codetype_id']);
          }}
         // const fff = ohvat[0]['controlled_subject_codes'];
