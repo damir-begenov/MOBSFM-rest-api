@@ -741,15 +741,6 @@ router.post('/postRuleViolation', verifyToken, async (req, res) => {
     const user = req.user;
     const now = new Date();
     try {
-        console.log(creatorOrgId);
-        console.log(binOrgCreator);
-        console.log(binOrgViolator);
-        console.log(subject_code_id);
-        console.log(date);
-        console.log(amount);
-        console.log(description);
-        console.log(article);
-        console.log(user);
 
         const ruleViolationQuery = `
             INSERT INTO rule_violation (created_at, changed_at, iin, amount, description, article, state_body_id,
