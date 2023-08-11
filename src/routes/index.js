@@ -120,8 +120,9 @@ router.get('/ocenkaBVUobwii', verifyToken, (req, res) => {
     })
 })
 
-router.post('/assessment', (req, res) => {
+router.post('/assessment', verifyToken, (req, res) => {
     const {organization_id} = req.body;
+    const user = req.user;
     db.task(async t => {
         const        assessments = await t.manyOrNone(`SELECT * FROM assessments_assessment 
          INNER JOIN assessments_assessmentitem ON assessments_assessment.id = assessments_assessmentitem.assessment_id 
@@ -260,7 +261,8 @@ router.post('/assessment', (req, res) => {
             assessment_fin_sum: assessment_fin,
             assessment_qualification_sum: assessment_qualification_sum,
             total_points: all_points,
-            total_points_2 : all_points_2
+            total_points_2 : all_points_2,
+            user: user
         }) 
     }).catch(err => {
         res.status(500).json({ success: false, message: 'Internal server error' });
@@ -358,7 +360,6 @@ router.post('/vovlechennost', (req,res) => {
                 codetype[0]['procents_of_org_names'] = (vovlechennost[0]['count']*100)/parseFloat(codetype[0]['count']);
                 percentage += codetype[0]['procents_of_org_names'];
                 codetype[0]['countapproved'] = parseInt(vovlechennost[0]['count'], 10);
-                console.log(organization_ohvat[0]['count']);
                 code_types.push(codetype[0]);
                 organization_ohvat_accepted.push(organization_ohvat);
                 if (codetype.length === 0) {
@@ -418,9 +419,6 @@ router.post('/ratingSFM', (req,res) => {
                where "date" >= '2023-08-01' and organization_id in 
                (select distinct(ao.id) from accounts_organization ao where ao.subject_code_id = $1 and ao.status = 'approved' and ao."blocked" = false) 
                 group by organization_id ) asd where p_points = 0 `,[subject_code_id[i]]);
-            ;
-                console.log(rating_good[0]['count']);
-
 
                 codetype[0]['rating_good'] = rating_good[0]['count']; 
                 codetype[0]['rating_satis'] = rating_satis[0]['count']; 
@@ -915,7 +913,6 @@ router.post('/riskListFiles', (req, res) => {
 });
 
 router.post('/checkCountOrg', (req, res) => {
-    console.log("Checking...")
     const {iin, password} = req.body;
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
@@ -1052,7 +1049,6 @@ router.post('/checkSession',(req, res) => {
                     const controlledCodes = controlled.map(item => parseInt(item.codetype_id));
 
                     const subject_codes = await t.manyOrNone('SELECT id, name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
-                    console.log(subject_codes);
                     organization.regulated_codes = subject_codes;
                 }
 
@@ -1200,7 +1196,6 @@ router.post('/login', (req, res) => {
                     const controlledCodes = controlled.map(item => parseInt(item.codetype_id));
 
                     const subject_codes = await t.manyOrNone('SELECT id, name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
-                    console.log(subject_codes);
                     organization.regulated_codes = subject_codes;
                 }
 
