@@ -758,7 +758,7 @@ router.post('/postRuleViolation', verifyToken, async (req, res) => {
         `;
         const ruleViolationValues = [now, now, binOrgViolator, amount, description, article, creatorOrgId, subject_code_id, date];
 
-        await testDb.one(ruleViolationQuery, ruleViolationValues);
+        await db.one(ruleViolationQuery, ruleViolationValues);
 
 
         res.json({success: true, user});
@@ -803,7 +803,7 @@ router.post('/postResults', verifyToken, async (req, res) => {
             VALUES ($1, $2, $3, $4, $5, $6)
         `;
 
-        await testDb.tx(async (t) => {
+        await db.tx(async (t) => {
             // Using transaction to execute all insert queries as a single unit of work
             const insertQueries = questionnaireAnswerValues.map((values) => t.none(questionnaireAnswerQuery, values));
             await t.batch(insertQueries);
