@@ -772,8 +772,9 @@ router.post('/postRuleViolation', verifyToken, async (req, res) => {
 
 
 
-router.post('/postResults', async (req, res) => {
-    const { organization_id, questionnaire_id, testResults } = req.body;
+router.post('/postResults', verifyToken, async (req, res) => {
+    const {organization_id, questionnaire_id, testResults} = req.body;
+    const user = req.user;
     const now = new Date();
 
     try {
@@ -781,12 +782,11 @@ router.post('/postResults', async (req, res) => {
         const parsedTestResults = JSON.parse(testResults);
 
         const questionnaireResultQuery = `
-      INSERT INTO questionnaire_questionnaireresult (created_at, changed_at, organization_id, questionnaire_id)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id;
-    `;
+            INSERT INTO questionnaire_questionnaireresult (created_at, changed_at, organization_id, questionnaire_id)
+            VALUES ($1, $2, $3, $4) RETURNING id;
+        `;
         const questionnaireResultValues = [now, now, organization_id, questionnaire_id];
-        const { id: questionnaire_result_id } = await testDb.one(questionnaireResultQuery, questionnaireResultValues);
+        const {id: questionnaire_result_id} = await testDb.one(questionnaireResultQuery, questionnaireResultValues);
 
         const questionnaireAnswerValues = parsedTestResults.map((result) => [
             now,
@@ -798,9 +798,10 @@ router.post('/postResults', async (req, res) => {
         ]);
 
         const questionnaireAnswerQuery = `
-      INSERT INTO questionnaire_organizationanswer (created_at, changed_at, answer_text, answer_id, question_id, questionnaire_result_id)
-      VALUES ($1, $2, $3, $4, $5, $6)
-    `;
+            INSERT INTO questionnaire_organizationanswer (created_at, changed_at, answer_text, answer_id, question_id,
+                                                          questionnaire_result_id)
+            VALUES ($1, $2, $3, $4, $5, $6)
+        `;
 
         await testDb.tx(async (t) => {
             // Using transaction to execute all insert queries as a single unit of work
@@ -808,10 +809,10 @@ router.post('/postResults', async (req, res) => {
             await t.batch(insertQueries);
         });
 
-        res.json({ success: true });
+        res.json({success: true, user: user});
     } catch (error) {
         console.error('Error inserting data:', error);
-        res.status(500).json({ success: false, error: 'Error inserting data' });
+        res.status(500).json({success: false, error: 'Error inserting data'});
     }
 });
 
