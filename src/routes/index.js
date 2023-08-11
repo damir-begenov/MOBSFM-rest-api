@@ -786,7 +786,7 @@ router.post('/postResults', verifyToken, async (req, res) => {
             VALUES ($1, $2, $3, $4) RETURNING id;
         `;
         const questionnaireResultValues = [now, now, organization_id, questionnaire_id];
-        const {id: questionnaire_result_id} = await testDb.one(questionnaireResultQuery, questionnaireResultValues);
+        const {id: questionnaire_result_id} = await db.one(questionnaireResultQuery, questionnaireResultValues);
 
         const questionnaireAnswerValues = parsedTestResults.map((result) => [
             now,
