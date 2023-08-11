@@ -758,15 +758,15 @@ router.post('/postRuleViolation', verifyToken, async (req, res) => {
         `;
         const ruleViolationValues = [now, now, binOrgViolator, amount, description, article, creatorOrgId, subject_code_id, date];
 
-        await db.one(ruleViolationQuery, ruleViolationValues);
+        await db.none(ruleViolationQuery, ruleViolationValues);
 
-
-        res.json({success: true, user});
+        res.json({ success: true, user });
     } catch (error) {
         console.error('Error inserting data:', error);
-        res.status(500).json({success: false, error: 'Error inserting data'});
+        res.status(500).json({ success: false, error: 'Error inserting data' });
     }
 });
+
 
 
 
