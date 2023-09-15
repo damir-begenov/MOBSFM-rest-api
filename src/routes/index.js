@@ -574,7 +574,7 @@ router.get('/education', (req, res) => {
 
 router.get('/news', (req,res) => {
     db.task(async t => {
-        const news = await t.manyOrNone('SELECT * FROM news_news WHERE authorized = false');
+        const news = await t.manyOrNone('SELECT * FROM news_news WHERE authorized = false order by publication_date DESC');
         res.json({
             news: news
         })
@@ -1094,7 +1094,7 @@ router.post('/checkSession',(req, res) => {
             // Invalid credentials
             res.status(401).json({ success: false, message: 'Invalid iin or password' });
         }
-    })
+    })//
         .catch(error => {
             console.error('Error occurred while logging in:', error);
             res.status(500).json({ success: false, message: 'Internal server error' });
@@ -1109,8 +1109,8 @@ router.post('/login', (req, res) => {
     // Query the database to validate the user's credentials and fetch additional data
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
-
-
+        //request for pwd-check (iin and password)
+        //if request is success then continue
         if (user && user.id === password) {
             const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
             if (organization) {
@@ -1235,6 +1235,7 @@ router.post('/login', (req, res) => {
                 });
             } else {
                 // Organization not found
+                //
                 res.status(404).json({ success: false, message: 'Organization not found' });
             }
         } else {
