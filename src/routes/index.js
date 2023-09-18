@@ -907,6 +907,7 @@ router.post('/riskListFiles', (req, res) => {
 
 router.post('/checkCountOrg', (req, res) => {
     const {iin, password} = req.body;
+    console.log(iin);
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         try{
