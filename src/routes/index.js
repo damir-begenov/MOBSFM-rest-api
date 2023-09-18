@@ -910,11 +910,12 @@ router.post('/checkCountOrg', (req, res) => {
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
         try{
-            const response = await axios.post('https://api.websfm.kz/v1/auth/pwd-check/', {
+            const response1 = await axios.post('https://api.websfm.kz/v1/auth/pwd-check/', {
                 username: iin,
                 password: password,
             });
-            if (response.status === 200 && response.data.valid){
+            console.log('1');
+            if (response1.status === 200 && response.data.valid){
                 const organization = await t.many('SELECT a.id, a.iin, a.organization_registration_date, a.registration_date, a.full_name, a.full_name_ru, a.full_name_kk, a.full_name_kaz, a.short_name, a.short_name_ru, a.short_name_kk, a.short_name_kaz, a.oked, a."type", a.blocking, a.reason_blocking, a.form_of_law_id, a.org_form_id, a.org_size_id, a.aifc_member, a."blocked", a.document_unique_identifier, a.is_fm1, a.is_afm_employee, a.is_afm_supervisor, a.p12_sign, a.status, b.code, b."name", b.name_ru, b.name_kk, b.name_kaz, b.count FROM accounts_organization a LEFT JOIN directories_codetype b ON a.subject_code_id = b.id WHERE a.id IN (SELECT organization_id FROM accounts_employee WHERE client_user_id = $1)', [user['id']]);
 
                 if (organization) {
