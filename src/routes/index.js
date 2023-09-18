@@ -909,10 +909,10 @@ router.post('/checkCountOrg', (req, res) => {
     const {iin, password} = req.body;
     db.task(async t => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE iin = $1', [iin]);
-        if (user && user.id === password) {
-            const organization = await t.many('SELECT a.id, a.iin, a.organization_registration_date, a.registration_date, a.full_name, a.full_name_ru, a.full_name_kk, a.full_name_kaz, a.short_name, a.short_name_ru, a.short_name_kk, a.short_name_kaz, a.oked, a."type", a.blocking, a.reason_blocking, a.form_of_law_id, a.org_form_id, a.org_size_id, a.aifc_member, a."blocked", a.document_unique_identifier, a.is_fm1, a.is_afm_employee, a.is_afm_supervisor, a.p12_sign, a.status, b.code, b."name", b.name_ru, b.name_kk, b.name_kaz, b.count FROM accounts_organization a LEFT JOIN directories_codetype b ON a.subject_code_id = b.id WHERE a.id IN (SELECT organization_id FROM accounts_employee WHERE client_user_id = $1)', [user['id']]);
 
-            if (organization) {
+        const organization = await t.many('SELECT a.id, a.iin, a.organization_registration_date, a.registration_date, a.full_name, a.full_name_ru, a.full_name_kk, a.full_name_kaz, a.short_name, a.short_name_ru, a.short_name_kk, a.short_name_kaz, a.oked, a."type", a.blocking, a.reason_blocking, a.form_of_law_id, a.org_form_id, a.org_size_id, a.aifc_member, a."blocked", a.document_unique_identifier, a.is_fm1, a.is_afm_employee, a.is_afm_supervisor, a.p12_sign, a.status, b.code, b."name", b.name_ru, b.name_kk, b.name_kaz, b.count FROM accounts_organization a LEFT JOIN directories_codetype b ON a.subject_code_id = b.id WHERE a.id IN (SELECT organization_id FROM accounts_employee WHERE client_user_id = $1)', [user['id']]);
+
+        if (organization) {
 
                 res.json({
                     success: true,
@@ -920,14 +920,11 @@ router.post('/checkCountOrg', (req, res) => {
                     organization: organization,
                     count: organization.length
                 });
-            } else {
+        } else {
                 // Organization not found
                 res.status(404).json({ success: false, message: 'Organization not found' });
-            }
-        } else {
-            // Invalid credentials
-            res.status(401).json({ success: false, message: 'Invalid iin' });
         }
+
     })
         .catch(error => {
             console.error('Error occurred while checking in:', error);
