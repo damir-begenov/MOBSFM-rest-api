@@ -1122,9 +1122,11 @@ router.post('/login', (req, res) => {
             });
 
             if (response.status === 200 && response.data.valid){
+                console.log('1');
                 if (user) {
                     const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
                     if (organization) {
+                        console.log('2');
                         const secretKey = process.env.SECRET_KEY;
                         const token = jwt.sign(
                             {
