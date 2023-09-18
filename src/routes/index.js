@@ -917,10 +917,9 @@ router.post('/checkCountOrg', (req, res) => {
             formData.append('username', iin);
             formData.append('password', password);
             console.log('3');
-            const response = await axios.post('https://api.websfm.kz/v1/auth/pwd-check/', formData, {
-                headers: {
-                    ...formData.getHeaders(), // Set the appropriate headers for form data
-                },
+            const response1 = await axios.post('http://api.websfm-test.afmrk.gov.kz/v1/auth/pwd-check/', {
+                username: iin,
+                password: password,
             });
             console.log('4');
             console.log(iin);
