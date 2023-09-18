@@ -6,6 +6,7 @@ const Organization = require('../classes/organization.js');
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const {auth} = require("firebase-admin");
+const axios = require('axios');
 var randtoken = require('rand-token')
 const {or, where} = require("sequelize");
 
@@ -1104,6 +1105,9 @@ router.post('/checkSession',(req, res) => {
 
 var refreshTokens = {} 
 
+
+
+
 router.post('/login', (req, res) => {
     const { iin, password, org_id } = req.body;
     // Query the database to validate the user's credentials and fetch additional data
@@ -1111,137 +1115,152 @@ router.post('/login', (req, res) => {
         const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1', [iin]);
         //request for pwd-check (iin and password)
         //if request is success then continue
-        if (user && user.id === password) {
-            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
-            if (organization) {
-                const secretKey = process.env.SECRET_KEY;
-                const token = jwt.sign(
-                    {
-                        "user_id": user.id,
-                        "user_iin": user.iin,
-                        "org_id": organization.id,
-                        "org_iin": organization.iin
-                    },
-                    secretKey,
-                    {
-                        expiresIn: "1h",
-                    }
-                );
+        try {
+            const response = await axios.post('https://api.websfm.kz/v1/auth/pwd-check/', {
+                username: iin,
+                password: password,
+            });
 
-                // save user token
-                user.token = token;
-                console.log(token)
-                const cfmCode = organization['subject_code_id'];
-                let docType = null;
-                let user_document = null;
-                let accounts_document_id = null;
-                let org_address = null;
-                let org_country = null;
-                let org_district = null;
-                let org_region = null;
+            if (response.status === 200 && response.data.valid){
+                if (user) {
+                    const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
+                    if (organization) {
+                        const secretKey = process.env.SECRET_KEY;
+                        const token = jwt.sign(
+                            {
+                                "user_id": user.id,
+                                "user_iin": user.iin,
+                                "org_id": organization.id,
+                                "org_iin": organization.iin
+                            },
+                            secretKey,
+                            {
+                                expiresIn: "1h",
+                            }
+                        );
 
-                accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]);
-                if(accounts_document_id['document_id'] != null){
-                    user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
-                    docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]);
-                    user.docType = docType['name'];
-                    user.docNumber = user_document['number'];
-                    user.docDateIssued = user_document['date_issue'];
-                    user.docIssuedBy = user_document['issued_by'];
-                    user.docSeries = user_document['series']
-                }
+                        // save user token
+                        user.token = token;
+                        console.log(token)
+                        const cfmCode = organization['subject_code_id'];
+                        let docType = null;
+                        let user_document = null;
+                        let accounts_document_id = null;
+                        let org_address = null;
+                        let org_country = null;
+                        let org_district = null;
+                        let org_region = null;
 
-                const userId = user['id'];
-                const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE id = $1', [cfmCode]);
+                        accounts_document_id = await t.oneOrNone('SELECT document_id FROM accounts_clientuser WHERE iin = $1', [iin]);
+                        if(accounts_document_id['document_id'] != null){
+                            user_document = await t.oneOrNone('SELECT * FROM accounts_document WHERE id = $1', [accounts_document_id['document_id']]);
+                            docType = await t.oneOrNone('SELECT name FROM accounts_typedocument WHERE id = $1', [user_document['type_document_id']]);
+                            user.docType = docType['name'];
+                            user.docNumber = user_document['number'];
+                            user.docDateIssued = user_document['date_issue'];
+                            user.docIssuedBy = user_document['issued_by'];
+                            user.docSeries = user_document['series']
+                        }
 
-                const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE id = $1', [org_id]);
-                const userRole = await t.many('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
-                org_address = await t.oneOrNone('SELECT * FROM accounts_organizationaddres WHERE organization_id = $1', [organization['id']]);
-                if(org_address!=null){
-                    org_country = await t.oneOrNone('SELECT * FROM directories_country WHERE id = $1', [org_address['country_id']]);
-                    org_district = await t.oneOrNone('SELECT * FROM directories_district WHERE id = $1', [org_address['district_id']]);
-                    org_region = await t.oneOrNone('SELECT * FROM directories_region WHERE id = $1', [org_address['region_id']]);
-                    org_address.country = org_country;
-                    org_address.district = org_district;
-                    org_address.region = org_region;
-                    delete org_address.region_id;
-                    delete org_address.district_id;
-                }
+                        const userId = user['id'];
+                        const subjectCode = await t.oneOrNone('SELECT name FROM directories_codetype WHERE id = $1', [cfmCode]);
+
+                        const orgType = await t.oneOrNone('SELECT type FROM accounts_organization WHERE id = $1', [org_id]);
+                        const userRole = await t.many('SELECT role FROM accounts_employee WHERE client_user_id = $1', [userId]);
+                        org_address = await t.oneOrNone('SELECT * FROM accounts_organizationaddres WHERE organization_id = $1', [organization['id']]);
+                        if(org_address!=null){
+                            org_country = await t.oneOrNone('SELECT * FROM directories_country WHERE id = $1', [org_address['country_id']]);
+                            org_district = await t.oneOrNone('SELECT * FROM directories_district WHERE id = $1', [org_address['district_id']]);
+                            org_region = await t.oneOrNone('SELECT * FROM directories_region WHERE id = $1', [org_address['region_id']]);
+                            org_address.country = org_country;
+                            org_address.district = org_district;
+                            org_address.region = org_region;
+                            delete org_address.region_id;
+                            delete org_address.district_id;
+                        }
 
 
-                const persons = await t.many('SELECT * FROM accounts_employee a INNER JOIN accounts_clientuser b on a.client_user_id = b.id WHERE a.organization_id = $1',[organization['id']]);
+                        const persons = await t.many('SELECT * FROM accounts_employee a INNER JOIN accounts_clientuser b on a.client_user_id = b.id WHERE a.organization_id = $1',[organization['id']]);
 
-                organization.persons = persons;
-                // Check if subjectCode is not null before accessing its properties
-                if (subjectCode !== null && typeof subjectCode === 'object') {
-                    organization.subjectCode = subjectCode['name'] ?? null;
-                } else {
-                    organization.subjectCode = null;
-                }
+                        organization.persons = persons;
+                        // Check if subjectCode is not null before accessing its properties
+                        if (subjectCode !== null && typeof subjectCode === 'object') {
+                            organization.subjectCode = subjectCode['name'] ?? null;
+                        } else {
+                            organization.subjectCode = null;
+                        }
 
-                organization.orgType = orgType['type'];
+                        organization.orgType = orgType['type'];
 
-                if(organization.orgType === 'state_body'){
-                    const controlled = await t.manyOrNone(
-                        `SELECT codetype_id FROM accounts_organization_subject_codes
+                        if(organization.orgType === 'state_body'){
+                            const controlled = await t.manyOrNone(
+                                `SELECT codetype_id FROM accounts_organization_subject_codes
                         WHERE organization_id = $1`, [organization.id]
-                    );
+                            );
 
-                    const controlledCodes = controlled.map(item => parseInt(item.codetype_id));
+                            const controlledCodes = controlled.map(item => parseInt(item.codetype_id));
 
-                    const subject_codes = await t.manyOrNone('SELECT id, name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
-                    organization.regulated_codes = subject_codes;
+                            const subject_codes = await t.manyOrNone('SELECT id, name FROM directories_codetype WHERE id = ANY($1)', [controlledCodes]);
+                            organization.regulated_codes = subject_codes;
+                        }
+
+                        organization.address = org_address;
+
+                        const colors = {
+                            reset: "\x1b[0m",
+                            red: "\x1b[31m",
+                            green: "\x1b[32m",
+                            yellow: "\x1b[33m",
+                            blue: "\x1b[34m",
+                            magenta: "\x1b[35m",
+                            cyan: "\x1b[36m",
+                        };
+
+                        function coloredLog(color, message) {
+                            console.log(`${color}${message}${colors.reset}`);
+                        }
+
+                        user.userRole = userRole[0]['role'];
+                        const currentTime = new Date();
+
+                        coloredLog(colors.magenta, '-------------------------------------------------')
+                        coloredLog(colors.green,'User is logged in at: ' + currentTime.toISOString() + '\n')
+                        coloredLog(colors.cyan,'User id: ' + user['first_name'])
+                        coloredLog(colors.cyan,'Users first name: ' + user['last_name'])
+                        coloredLog(colors.cyan,'Users last name: ' + user['id'])
+                        coloredLog(colors.cyan,'Users iin: ' + user['iin'])
+                        // Authentication successful
+
+                        coloredLog(colors.yellow, 'Organization information: ' + '\n')
+                        coloredLog(colors.cyan, 'Organization id: ' + organization['id'])
+                        coloredLog(colors.cyan, 'Organization iin:: ' + organization['iin'])
+                        coloredLog(colors.cyan, 'Organization name: ' + organization['full_name'])
+                        coloredLog(colors.cyan, 'Organization type: ' + organization['orgType'])
+                        coloredLog(colors.cyan, 'Subject code: ' + organization['subjectCode'])
+
+                        res.json({
+                            success: true,
+                            message: 'Login successful',
+                            user: user,
+                            organization: organization,
+                        });
+                    } else {
+                        // Organization not found
+                        //
+                        res.status(404).json({ success: false, message: 'Organization not found' });
+                    }
+                } else {
+                    // Invalid credentials
+                    res.status(401).json({ success: false, message: 'Invalid iin or password' });
                 }
-
-                organization.address = org_address;
-
-                const colors = {
-                    reset: "\x1b[0m",
-                    red: "\x1b[31m",
-                    green: "\x1b[32m",
-                    yellow: "\x1b[33m",
-                    blue: "\x1b[34m",
-                    magenta: "\x1b[35m",
-                    cyan: "\x1b[36m",
-                };
-
-                function coloredLog(color, message) {
-                    console.log(`${color}${message}${colors.reset}`);
-                }
-
-                user.userRole = userRole[0]['role'];
-                const currentTime = new Date();
-
-                coloredLog(colors.magenta, '-------------------------------------------------')
-                coloredLog(colors.green,'User is logged in at: ' + currentTime.toISOString() + '\n')
-                coloredLog(colors.cyan,'User id: ' + user['first_name'])
-                coloredLog(colors.cyan,'Users first name: ' + user['last_name'])
-                coloredLog(colors.cyan,'Users last name: ' + user['id'])
-                coloredLog(colors.cyan,'Users iin: ' + user['iin'])
-                // Authentication successful
-
-                coloredLog(colors.yellow, 'Organization information: ' + '\n')
-                coloredLog(colors.cyan, 'Organization id: ' + organization['id'])
-                coloredLog(colors.cyan, 'Organization iin:: ' + organization['iin'])
-                coloredLog(colors.cyan, 'Organization name: ' + organization['full_name'])
-                coloredLog(colors.cyan, 'Organization type: ' + organization['orgType'])
-                coloredLog(colors.cyan, 'Subject code: ' + organization['subjectCode'])
-
-                res.json({
-                    success: true,
-                    message: 'Login successful',
-                    user: user,
-                    organization: organization,
-                });
-            } else {
-                // Organization not found
-                //
-                res.status(404).json({ success: false, message: 'Organization not found' });
+            } else{
+                res.status(401).json({ success: false, message: 'Invalid iin or password' });
             }
-        } else {
-            // Invalid credentials
-            res.status(401).json({ success: false, message: 'Invalid iin or password' });
+        } catch (error) {
+            console.error('Error calling external API:', error);
+            res.status(500).json({ success: false, message: 'Internal server error' });
         }
+
     })
         .catch(error => {
             console.error('Error occurred while logging in:', error);

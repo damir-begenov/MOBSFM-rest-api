@@ -15,6 +15,7 @@
   "dependencies": {
     "@aws-sdk/client-sns": "^3.363.0",
     "aws-sdk": "^2.1413.0",
+    "axios": "^1.5.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
