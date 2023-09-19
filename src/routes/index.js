@@ -1216,9 +1216,9 @@ router.post('/login', (req, res) => {
 
                 coloredLog(colors.magenta, '-------------------------------------------------')
                 coloredLog(colors.green,'User is logged in at: ' + currentTime.toISOString() + '\n')
-                coloredLog(colors.cyan,'User id: ' + user['first_name'])
-                coloredLog(colors.cyan,'Users first name: ' + user['last_name'])
-                coloredLog(colors.cyan,'Users last name: ' + user['id'])
+                coloredLog(colors.cyan,'User id: '  + user['id'])
+                coloredLog(colors.cyan,'Users first name: ' + user['first_name'])
+                coloredLog(colors.cyan,'Users last name: ' + user['last_name'])
                 coloredLog(colors.cyan,'Users iin: ' + user['iin'])
                 // Authentication successful
 
