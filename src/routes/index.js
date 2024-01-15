@@ -659,9 +659,9 @@ router.post('/section3Acategory', (req, res) => {
         const acting = 'acting'
         const excluded = 'excluded'
         const included = 'included'
-        const category_content_acting = await t.many('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = $2', [category, acting])
-        const category_content_excluded = await t.many('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = $2', [category, excluded])
-        const category_content_included = await t.many('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = $2', [category, included])
+        const category_content_acting = await t.manyOrNone('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = $2', [category, acting])
+        const category_content_excluded = await t.manyOrNone('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = $2', [category, excluded])
+        const category_content_included = await t.manyOrNone('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = $2', [category, included])
 
 
         res.json({
