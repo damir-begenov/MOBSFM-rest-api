@@ -654,20 +654,11 @@ router.post('/getViolations', verifyToken, (req, res) => {
 
 
 router.post('/section3Acategory', (req, res) => {
-    const {category} = req.body;
+    const {category, status} = req.body;
     db.task(async t => {
-        const acting = 'acting'
-        const excluded = 'excluded'
-        const included = 'included'
-        const category_content_acting = await t.manyOrNone('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = $2', [category, acting])
-        const category_content_excluded = await t.manyOrNone('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = $2', [category, excluded])
-        const category_content_included = await t.manyOrNone('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = $2', [category, included])
-
-
+        const category_content = await t.manyOrNone('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = $2', [category, status])
         res.json({
-            category_content_acting: category_content_acting,
-            category_content_excluded: category_content_excluded,
-            category_content_included: category_content_included
+            category_content: category_content,
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error', error: error});
