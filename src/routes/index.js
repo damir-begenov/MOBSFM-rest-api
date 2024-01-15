@@ -656,10 +656,10 @@ router.post('/getViolations', verifyToken, (req, res) => {
 router.post('/section3Acategory', (req, res) => {
     const {category} = req.body;
     db.task(async t => {
-        const category_content = await t.many('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1', [category])
+        const category_content_acting = await t.many('SELECT * FROM sanctions_sanctionterrorist WHERE category = $1 and status = "acting"', [category])
 
         res.json({
-            category_content: category_content
+            category_content: category_content_acting
         })
     }).catch(error => {
         res.status(500).json({ success: false, message: 'Internal server error', error: error});
