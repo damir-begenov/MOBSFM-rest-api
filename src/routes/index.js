@@ -74,6 +74,8 @@ router.post('/ocenkaBVU', verifyToken, (req, res) => {
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day')  and organization_id = $1)`, [organization_id]);
         const internalrulesapplication = await t.manyOrNone(`select sum(point)/count(*) as internalrulesapplication from public.assessments_internalrulesapplication where assessment_id in (SELECT id FROM public.assessments_bankassessment  ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
         AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1)`, [organization_id]);
+        const finance_terrorism = await t.manyOrNone(`select sum(point)/count(*) as finance_terrorism from public.assessments_financeterrorism where assessment_id in (SELECT id FROM public.assessments_bankassessment  ab where "date" >= date_trunc('month', current_date) + INTERVAL '1 day'
+        AND "date" < (date_trunc('month', current_date) + INTERVAL '1 month' - INTERVAL '1 day') and organization_id = $1)`, [organization_id]);
         const results = {
             idshka: idshka,
             bankinteractionlevel: bankinteractionlevel[0]['bankinteractionlevel'],
@@ -81,6 +83,7 @@ router.post('/ocenkaBVU', verifyToken, (req, res) => {
             sentmessagescorrectness: sentmessagescorrectness[0]['sentmessagescorrectness'],
             cashingoutbankinvolvement: cashingoutbankinvolvement[0]['cashingoutbankinvolvement'],
             internalrulesapplication: internalrulesapplication[0]['internalrulesapplication'],
+            finance_terrorism: finance_terrorism[0]['finance_terrorism'],
         };
         res.json({
             results: results,
