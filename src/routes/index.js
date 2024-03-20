@@ -983,7 +983,7 @@ router.post('/checkSession',(req, res) => {
                     },
                     secretKey,
                     {
-                        expiresIn: "1h",
+                        expiresIn: "24h",
                     }
                 );
 
