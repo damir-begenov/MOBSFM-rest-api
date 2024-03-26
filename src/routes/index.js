@@ -40,22 +40,33 @@ router.post('/certificate', verifyToken,(req, res) => {
     });
 });
 
-router.post('/regulatory_document', verifyToken,(req, res) => {
-    const {organization_id} = req.body;
+router.post('/ocenkaBVU', verifyToken, (req, res) => {
+    const {organization_id} = req.body
     const user = req.user;
     db.task(async t => {
-        const regulatory_document_cur = await t.manyOrNone(`SELECT * FROM regulatory_document 
-        where organization_id = $1 and type_document = 'cur'`,[organization_id]);
-        const regulatory_document_pvk = await t.manyOrNone(`SELECT * FROM regulatory_document 
-        where organization_id = $1 and type_document = 'pvk'`,[organization_id]);
-
+        const idshka = await t.manyOrNone(`SELECT id FROM public.assessments_bankassessment ab where "date" <= date_trunc('month', current_date) + INTERVAL '1 day' AND "date" > (date_trunc('month', current_date) - INTERVAL '1 month' + INTERVAL '1 day') and    organization_id = $1`, [organization_id]);
+        const bankinteractionlevel = await t.manyOrNone(`select sum(point)/count(*) as bankinteractionlevel from public.assessments_bankinteractionlevel ab where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" <= date_trunc('month', current_date) + INTERVAL '1 day' AND "date" > (date_trunc('month', current_date) - INTERVAL '1 month' + INTERVAL '1 day') and    organization_id = $1)`, [organization_id]);
+        const suspensionquality = await t.manyOrNone(`select sum(point)/count(*) as suspensionquality from public.assessments_suspensionquality ab where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" <= date_trunc('month', current_date) + INTERVAL '1 day' AND "date" > (date_trunc('month', current_date) - INTERVAL '1 month' + INTERVAL '1 day') and    organization_id = $1)`, [organization_id]);
+        const sentmessagescorrectness = await t.manyOrNone(`select sum(point)/count(*) as sentmessagescorrectness from public.assessments_sentmessagescorrectness where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" <= date_trunc('month', current_date) + INTERVAL '1 day' AND "date" > (date_trunc('month', current_date) - INTERVAL '1 month' + INTERVAL '1 day') and    organization_id = $1)`, [organization_id]);
+        const cashingoutbankinvolvement = await t.manyOrNone(`select sum(point)/count(*) as cashingoutbankinvolvement from public.assessments_cashingoutbankinvolvement where assessment_id in (SELECT id FROM public.assessments_bankassessment ab where "date" <= date_trunc('month', current_date) + INTERVAL '1 day' AND "date" > (date_trunc('month', current_date) - INTERVAL '1 month' + INTERVAL '1 day') and    organization_id = $1)`, [organization_id]);
+        const internalrulesapplication = await t.manyOrNone(`select sum(point)/count(*) as internalrulesapplication from public.assessments_internalrulesapplication where assessment_id in (SELECT id FROM public.assessments_bankassessment  ab where "date" <= date_trunc('month', current_date) + INTERVAL '1 day' AND "date" > (date_trunc('month', current_date) - INTERVAL '1 month' + INTERVAL '1 day') and    organization_id = $1)`, [organization_id]);
+        const finance_terrorism = await t.manyOrNone(`select sum(point)/count(*) as finance_terrorism from public.assessments_financeterrorism where assessment_id in (SELECT id FROM public.assessments_bankassessment  ab where "date" <= date_trunc('month', current_date) + INTERVAL '1 day' AND "date" > (date_trunc('month', current_date) - INTERVAL '1 month' + INTERVAL '1 day') and    organization_id = $1)`, [organization_id]);        
+        const results = {
+            idshka: idshka,
+            bankinteractionlevel: bankinteractionlevel[0]['bankinteractionlevel'],
+            suspensionquality: suspensionquality[0]['suspensionquality'],
+            sentmessagescorrectness: sentmessagescorrectness[0]['sentmessagescorrectness'],
+            cashingoutbankinvolvement: cashingoutbankinvolvement[0]['cashingoutbankinvolvement'],
+            internalrulesapplication: internalrulesapplication[0]['internalrulesapplication'],
+            finance_terrorism: finance_terrorism[0]['finance_terrorism'],
+        };
         res.json({
-            regulatory_document_cur: regulatory_document_cur,
-            regulatory_document_pvk: regulatory_document_pvk,
-            user
-        })
-    });
-});
+            results: results,
+            user: user
+        });
+    })
+})
+
 
 router.post('/ocenkaBVU', verifyToken, (req, res) => {
     const {organization_id} = req.body
