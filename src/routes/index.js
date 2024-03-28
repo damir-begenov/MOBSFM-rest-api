@@ -1149,6 +1149,36 @@ router.post('/loginprod', async (req, res) => {
   }
 });
 
+router.post('/logintest', async (req, res) => {
+    const { iin, password } = req.body;
+
+    db.task(async t => {
+        const user = await t.oneOrNone('SELECT * FROM accounts_clientuser WHERE "iin" = $1 and "id" = $2', [iin, password]);
+        //request for pwd-check (iin and password)
+        //if request is success then continue
+
+        if (user) {
+            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
+                res.json({
+                    success: true,
+                    message: 'Login successful',
+                    user: user
+                });
+            } else {
+                // Organization not found
+                //
+                res.status(404).json({ success: false, message: 'Organization not found' });
+            }
+         else {
+            // Invalid credentials
+            res.status(401).json({ success: false, message: 'Invalid iin or password' });
+        }
+    })
+        .catch(error => {
+            console.error('Error occurred while logging in:', error);
+            res.status(500).json({ success: false, message: 'Internal server error' });
+        });
+});
 
 
 router.post('/login', (req, res) => {
