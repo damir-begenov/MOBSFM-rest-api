@@ -9,7 +9,8 @@ const {auth} = require("firebase-admin");
 const axios = require('axios');
 var randtoken = require('rand-token')
 const {or, where} = require("sequelize");
-
+const axios = require('axios');
+const FormData = require('form-data');
 const { DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME, DB_NAME_TEST, DB_HOST_TEST, DB_PASSWORD_TEST } = process.env;
 const connectionString = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 const db = pgp(connectionString);
@@ -1123,6 +1124,33 @@ router.post('/checkSession',(req, res) => {
 
 var refreshTokens = {} 
 
+router.post('/loginprod', async (req, res) => {
+    try {
+        const { iin, password } = req.body;
+
+        const form = new FormData();
+        form.append('username', iin); // Assuming 'iin' is equivalent to 'username'
+        form.append('password', password);
+
+        const response = await axios.post('https://api.websfm.kz/v1/auth/pwd-check/', form, {
+            headers: {
+                ...form.getHeaders()
+            }
+        });
+
+        if (response.status === 200) {
+            // Authentication successful, handle response here
+            res.status(200).json(response.data);
+        } else {
+            // Handle other status codes
+            res.status(response.status).json({ error: response.statusText });
+        }
+    } catch (error) {
+        // Handle request error
+        console.error('Error occurred:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 
 
