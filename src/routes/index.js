@@ -1158,7 +1158,6 @@ router.post('/logintest', async (req, res) => {
         //if request is success then continue
 
         if (user) {
-            const organization = await t.oneOrNone('SELECT * FROM accounts_organization WHERE id = $1', [org_id]);
                 res.json({
                     success: true,
                     message: 'Login successful',
