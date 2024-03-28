@@ -1167,12 +1167,8 @@ router.post('/logintest', async (req, res) => {
             } else {
                 // Organization not found
                 //
-                res.status(404).json({ success: false, message: 'Organization not found' });
+                res.status(404).json({ success: false, message: 'Try again' });
             }
-         else {
-            // Invalid credentials
-            res.status(401).json({ success: false, message: 'Invalid iin or password' });
-        }
     })
         .catch(error => {
             console.error('Error occurred while logging in:', error);
