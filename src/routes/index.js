@@ -6,7 +6,6 @@ const Organization = require('../classes/organization.js');
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const {auth} = require("firebase-admin");
-const axios = require('axios');
 var randtoken = require('rand-token')
 const {or, where} = require("sequelize");
 const axios = require('axios');
