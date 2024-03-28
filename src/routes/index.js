@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const pgp = require('pg-promise')();
 const xml2js = require('xml2js');
 const Organization = require('../classes/organization.js');
@@ -1124,31 +1125,28 @@ router.post('/checkSession',(req, res) => {
 var refreshTokens = {} 
 
 router.post('/loginprod', async (req, res) => {
-    try {
-        const { iin, password } = req.body;
+  try {
+    const { iin, password } = req.body;
 
-        const form = new FormData();
-        form.append('username', iin); // Assuming 'iin' is equivalent to 'username'
-        form.append('password', password);
+    const requestBody = {
+      username: iin, // Assuming 'iin' is equivalent to 'username'
+      password: password
+    };
 
-        const response = await axios.post('https://api.websfm.kz/v1/auth/pwd-check/', form, {
-            headers: {
-                ...form.getHeaders()
-            }
-        });
+    const response = await axios.post('https://api.websfm.kz/v1/auth/pwd-check/', requestBody);
 
-        if (response.status === 200) {
-            // Authentication successful, handle response here
-            res.status(200).json(response.data);
-        } else {
-            // Handle other status codes
-            res.status(response.status).json({ error: response.statusText });
-        }
-    } catch (error) {
-        // Handle request error
-        console.error('Error occurred:', error.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+    if (response.status === 200) {
+      // Authentication successful, handle response here
+      res.status(200).json(response.data);
+    } else {
+      // Handle other status codes
+      res.status(response.status).json({ error: response.statusText });
     }
+  } catch (error) {
+    // Handle request error
+    console.error('Error occurred:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 
